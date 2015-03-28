@@ -910,8 +910,8 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			else
 			{
 				ServerStats.is_kill++;
-				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
-						form_str(ERR_NICKCOLLISION), target_p->name);
+				sendto_one_numeric(source_p, ERR_NICKCOLLISION,
+						form_str(ERR_NICKCOLLISION), source_p->name);
 
 				/* now we just need to kill the existing client */
 				kill_client_serv_butone(client_p, target_p,
