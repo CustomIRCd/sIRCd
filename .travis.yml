@@ -5,7 +5,7 @@ compiler:
 before-install:
 - sudo apt-get update
 install:
-- sudo apt-get install build-essential libssl-dev flex bison
+- sudo apt-get install build-essential libssl-dev flex bison pkg-config
 script: "./configure && make && make install"
 
 notifications:
