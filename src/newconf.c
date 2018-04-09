@@ -2131,7 +2131,8 @@ static struct ConfEntry conf_serverinfo_table[] =
 
 	{ "ssl_private_key",    CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
 	{ "ssl_ca_cert",        CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
-	{ "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
+	{ "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },
+        { "ssl_cipher_list",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_cipher_list },
 	{ "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
 	{ "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
 
