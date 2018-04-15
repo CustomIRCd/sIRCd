@@ -11,3 +11,4 @@
 - [X] - upgrade sqlite to 3.8.10
 - [X] - remove last update to m_sasl.c
 - [X] - added another cloaking module
+- [X] - fix openssl
