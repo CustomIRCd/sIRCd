@@ -19,12 +19,13 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  *  USA
  *
+ *  $Id: commio-ssl.h 26280 2008-12-10 20:25:29Z androsyn $
  */
 
 #ifndef _COMMIO_SSL_H
 #define _COMMIO_SSL_H
 
-/*int rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cipher_list); */
+int rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile);
 int rb_init_ssl(void);
 
 int rb_ssl_listen(rb_fde_t *F, int backlog, int defer_accept);

@@ -356,7 +356,7 @@ rb_init_ssl(void)
 
 
 int
-rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cipher_list)
+rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 {
 	DH *dh;
 	unsigned long err;
@@ -414,12 +414,6 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, c
 				   dhfile, get_ssl_error(err));
 		}
 	}
-
-	if (cipher_list != NULL)
-	{
-		SSL_CTX_set_cipher_list(ssl_server_ctx, cipher_list);
-	}
-
 	return 1;
 }
 
@@ -656,7 +650,7 @@ rb_get_ssl_strerror(rb_fde_t *F)
 }
 
 int
-rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN], int method)
+rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN])
 {
 	X509 *cert;
 	int res;
@@ -698,20 +692,6 @@ rb_get_ssl_info(char *buf, size_t len)
 	rb_snprintf(buf, len, "Using SSL: %s compiled: 0x%lx, library 0x%lx",
 		    SSLeay_version(SSLEAY_VERSION),
 		    (long)OPENSSL_VERSION_NUMBER, SSLeay());
-}
-
-const char *
-rb_ssl_get_cipher(rb_fde_t *F)
-{
-	const SSL_CIPHER *sslciph;
-
-	if(F == NULL || F->ssl == NULL)
-		return NULL;
-
-	if((sslciph = SSL_get_current_cipher(F->ssl)) == NULL)
-		return NULL;
-
-	return SSL_CIPHER_get_name(sslciph);
 }
 
 

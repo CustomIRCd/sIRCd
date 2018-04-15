@@ -31,29 +31,23 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/crypto.h>
 
-#if (GNUTLS_VERSION_MAJOR < 3)
+#if GNUTLS_VERSION_MAJOR < 3
 # include <gcrypt.h>
-#else
-# include <gnutls/crypto.h>
 #endif
 
 static gnutls_certificate_credentials_t x509;
 static gnutls_dh_params_t dh_params;
-static gnutls_priority_t default_priority;
 
 /* These are all used for getting GnuTLS to supply a client cert. */
 #define MAX_CERTS 6
 static unsigned int x509_cert_count;
 static gnutls_x509_crt_t x509_cert[MAX_CERTS];
 static gnutls_x509_privkey_t x509_key;
-#if GNUTLS_VERSION_MAJOR < 3
 static int cert_callback(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn, int nreqs,
 	const gnutls_pk_algorithm_t *sign_algos, int sign_algos_len, gnutls_retr_st *st);
-#else
-static int cert_callback(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn, int nreqs,
-	const gnutls_pk_algorithm_t *sign_algos, int sign_algos_len, gnutls_retr2_st *st);
-#endif
+
 
 #define SSL_P(x) *((gnutls_session_t *)F->ssl)
 
@@ -163,8 +157,6 @@ rb_ssl_start_accepted(rb_fde_t *new_F, ACCB * cb, void *data, int timeout)
 	gnutls_dh_set_prime_bits(*ssl, 1024);
 	gnutls_transport_set_ptr(*ssl, (gnutls_transport_ptr_t) (long int)new_F->fd);
 	gnutls_certificate_server_set_request(*ssl, GNUTLS_CERT_REQUEST);
-	gnutls_priority_set(*ssl, default_priority);
-
 	if(do_ssl_handshake(new_F, rb_ssl_tryaccept, NULL))
 	{
 		struct acceptdata *ad = new_F->accept;
@@ -197,8 +189,6 @@ rb_ssl_accept_setup(rb_fde_t *F, rb_fde_t *new_F, struct sockaddr *st, int addrl
 	gnutls_dh_set_prime_bits(SSL_P(new_F), 1024);
 	gnutls_transport_set_ptr(SSL_P(new_F), (gnutls_transport_ptr_t) (long int)rb_get_fd(new_F));
 	gnutls_certificate_server_set_request(SSL_P(new_F), GNUTLS_CERT_REQUEST);
-	gnutls_priority_set(SSL_P(F), default_priority);
-
 	if(do_ssl_handshake(F, rb_ssl_tryaccept, NULL))
 	{
 		struct acceptdata *ad = F->accept;
@@ -257,13 +247,13 @@ rb_ssl_write(rb_fde_t *F, const void *buf, size_t count)
 	return rb_ssl_read_or_write(1, F, NULL, buf, count);
 }
 
-#if (GNUTLS_VERSION_MAJOR < 3)
 static void
 rb_gcry_random_seed(void *unused)
 {
+#if GNUTLS_VERSION_MAJOR < 3
 	gcry_fast_random_poll();
-}
 #endif
+}
 
 int
 rb_init_ssl(void)
@@ -276,16 +266,12 @@ rb_init_ssl(void)
 		return 0;
 	}
 
-#if GNUTLS_VERSION_MAJOR < 3
+	/* This should be changed to gnutls_certificate_set_retrieve_function2 once
+	 * everyone in the world has upgraded to GnuTLS 3.
+	 */
 	gnutls_certificate_client_set_retrieve_function(x509, cert_callback);
-#else
-	gnutls_certificate_set_retrieve_function(x509, cert_callback);
-#endif
 
-#if (GNUTLS_VERSION_MAJOR < 3)
 	rb_event_addish("rb_gcry_random_seed", rb_gcry_random_seed, NULL, 300);
-#endif
-
 	return 1;
 }
 
@@ -296,27 +282,15 @@ rb_init_ssl(void)
  * as it breaks fingerprint auth.  Thus, we use this callback to force GnuTLS to always
  * authenticate with our certificate at all times.
  */
-#if GNUTLS_VERSION_MAJOR < 3
 static int
 cert_callback(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn, int nreqs,
 	const gnutls_pk_algorithm_t *sign_algos, int sign_algos_len, gnutls_retr_st *st)
-#else
-static int
-cert_callback(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn, int nreqs,
-	const gnutls_pk_algorithm_t *sign_algos, int sign_algos_len, gnutls_retr2_st *st)
-#endif
 {
 	/* XXX - ugly hack. Tell GnuTLS to use the first (only) certificate we have for auth. */
-#if (GNUTLS_VERSION_MAJOR < 3)
 	st->type = GNUTLS_CRT_X509;
-#else
-	st->cert_type = GNUTLS_CRT_X509;
-	st->key_type = GNUTLS_PRIVKEY_X509;
-#endif
 	st->ncerts = x509_cert_count;
 	st->cert.x509 = x509_cert;
 	st->key.x509 = x509_key;
-	st->deinit_all = 0;
 
 	return 0;
 }
@@ -353,10 +327,9 @@ rb_load_file_into_datum_t(const char *file)
 }
 
 int
-rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cipher_list)
+rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 {
 	int ret;
-	const char *err;
 	gnutls_datum_t *d_cert, *d_key;
 	if(cert == NULL)
 	{
@@ -429,15 +402,6 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, c
 		else
 			rb_lib_log("rb_setup_ssl_server: Unable to setup DH parameters");
 	}
-
-	ret = gnutls_priority_init(&default_priority, cipher_list, &err);
-	if (ret < 0)
-	{
-		rb_lib_log("rb_setup_ssl_server: syntax error (using defaults instead) in ssl cipher list at: %s", err);
-		gnutls_priority_init(&default_priority, NULL, &err);
-		return 1;
-	}
-
 	return 1;
 }
 
@@ -518,7 +482,6 @@ rb_ssl_tryconn(rb_fde_t *F, int status, void *data)
 	gnutls_credentials_set(SSL_P(F), GNUTLS_CRD_CERTIFICATE, x509);
 	gnutls_dh_set_prime_bits(SSL_P(F), 1024);
 	gnutls_transport_set_ptr(SSL_P(F), (gnutls_transport_ptr_t) (long int)F->fd);
-	gnutls_priority_set(SSL_P(F), default_priority);
 
 	do_ssl_handshake(F, rb_ssl_tryconn_cb, (void *)sconn);
 }
@@ -561,7 +524,6 @@ rb_ssl_start_connected(rb_fde_t *F, CNCB * callback, void *data, int timeout)
 	gnutls_credentials_set(SSL_P(F), GNUTLS_CRD_CERTIFICATE, x509);
 	gnutls_dh_set_prime_bits(SSL_P(F), 1024);
 	gnutls_transport_set_ptr(SSL_P(F), (gnutls_transport_ptr_t) (long int)F->fd);
-	gnutls_priority_set(SSL_P(F), default_priority);
 
 	rb_settimeout(F, sconn->timeout, rb_ssl_tryconn_timeout_cb, sconn);
 
@@ -573,6 +535,8 @@ rb_init_prng(const char *path, prng_seed_t seed_type)
 {
 #if GNUTLS_VERSION_MAJOR < 3
 	gcry_fast_random_poll();
+#else
+	gnutls_rnd_refresh();
 #endif
 	return 1;
 }
@@ -588,6 +552,17 @@ rb_get_random(void *buf, size_t length)
 	return 1;
 }
 
+int
+rb_get_pseudo_random(void *buf, size_t length)
+{
+#if GNUTLS_VERSION_MAJOR < 3
+	gcry_randomize(buf, length, GCRY_WEAK_RANDOM);
+#else
+	gnutls_rnd(GNUTLS_RND_RANDOM, buf, length);
+#endif
+	return 1;
+}
+
 const char *
 rb_get_ssl_strerror(rb_fde_t *F)
 {
@@ -595,15 +570,13 @@ rb_get_ssl_strerror(rb_fde_t *F)
 }
 
 int
-rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN], int method)
+rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN])
 {
 	gnutls_x509_crt_t cert;
-	gnutls_digest_algorithm_t algo;
 	unsigned int cert_list_size;
 	const gnutls_datum_t *cert_list;
 	uint8_t digest[RB_SSL_CERTFP_LEN * 2];
 	size_t digest_size;
-	int len;
 
 	if (gnutls_certificate_type_get(SSL_P(F)) != GNUTLS_CRT_X509)
 		return 0;
@@ -625,34 +598,16 @@ rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN], int method)
 		return 0;
 	}
 
-	switch(method)
-	{
-	case RB_SSL_CERTFP_METH_SHA1:
-		algo = GNUTLS_DIG_SHA1;
-		len = RB_SSL_CERTFP_LEN_SHA1;
-		break;
-	case RB_SSL_CERTFP_METH_SHA256:
-		algo = GNUTLS_DIG_SHA256;
-		len = RB_SSL_CERTFP_LEN_SHA256;
-		break;
-	case RB_SSL_CERTFP_METH_SHA512:
-		algo = GNUTLS_DIG_SHA512;
-		len = RB_SSL_CERTFP_LEN_SHA512;
-		break;
-	default:
-		return 0;
-	}
-
-	if (gnutls_x509_crt_get_fingerprint(cert, algo, digest, &digest_size) < 0)
+	if (gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1, digest, &digest_size) < 0)
 	{
 		gnutls_x509_crt_deinit(cert);
 		return 0;
 	}
 
-	memcpy(certfp, digest, len);
+	memcpy(certfp, digest, RB_SSL_CERTFP_LEN);
 
 	gnutls_x509_crt_deinit(cert);
-	return len;
+	return 1;
 }
 
 int
@@ -668,18 +623,5 @@ rb_get_ssl_info(char *buf, size_t len)
 		    LIBGNUTLS_VERSION, gnutls_check_version(NULL));
 }
 
-const char *
-rb_ssl_get_cipher(rb_fde_t *F)
-{
-	static char buf[1024];
-
-	rb_snprintf(buf, sizeof(buf), "%s-%s-%s-%s",
-		gnutls_protocol_get_name(gnutls_protocol_get_version(SSL_P(F))),
-		gnutls_kx_get_name(gnutls_kx_get(SSL_P(F))),
-		gnutls_cipher_get_name(gnutls_cipher_get(SSL_P(F))),
-		gnutls_mac_get_name(gnutls_mac_get(SSL_P(F))));
-
-	return buf;
-}
 
 #endif /* HAVE_GNUTLS */

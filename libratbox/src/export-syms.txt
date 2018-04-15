@@ -154,4 +154,3 @@ rb_getpid
 rb_waitpid
 rb_basename
 rb_dirname
-rb_ssl_get_cipher

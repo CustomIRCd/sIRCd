@@ -99,16 +99,7 @@ void rb_note(rb_fde_t *, const char *);
 #define RB_SELECT_ACCEPT		RB_SELECT_READ
 #define RB_SELECT_CONNECT		RB_SELECT_WRITE
 
-#define RB_SSL_CERTFP_LEN	64
-
-/* Methods for certfp */
-#define RB_SSL_CERTFP_METH_SHA1		0
-#define RB_SSL_CERTFP_METH_SHA256	1
-#define RB_SSL_CERTFP_METH_SHA512	2
-
-#define RB_SSL_CERTFP_LEN_SHA1		20
-#define RB_SSL_CERTFP_LEN_SHA256	32
-#define RB_SSL_CERTFP_LEN_SHA512	64
+#define RB_SSL_CERTFP_LEN	20
 
 int rb_set_nb(rb_fde_t *);
 int rb_set_buffers(rb_fde_t *, int);
@@ -133,7 +124,7 @@ ssize_t rb_writev(rb_fde_t *, struct rb_iovec *vector, int count);
 ssize_t rb_read(rb_fde_t *, void *buf, int count);
 int rb_pipe(rb_fde_t **, rb_fde_t **, const char *desc);
 
-int rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cipher_list);
+int rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile);
 int rb_ssl_listen(rb_fde_t *, int backlog, int defer_accept);
 int rb_listen(rb_fde_t *, int backlog, int defer_accept);
 
@@ -151,7 +142,7 @@ int rb_select(unsigned long);
 int rb_fd_ssl(rb_fde_t *F);
 int rb_get_fd(rb_fde_t *F);
 const char *rb_get_ssl_strerror(rb_fde_t *F);
-int rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN], int method);
+int rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN]);
 
 rb_fde_t *rb_get_fde(int fd);
 
@@ -186,7 +177,5 @@ void rb_ssl_clear_handshake_count(rb_fde_t *F);
 
 int rb_pass_fd_to_process(rb_fde_t *, pid_t, rb_fde_t *);
 rb_fde_t *rb_recv_fd(rb_fde_t *);
-
-const char *rb_ssl_get_cipher(rb_fde_t *F);
 
 #endif /* INCLUDED_commio_h */

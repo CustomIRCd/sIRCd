@@ -67,8 +67,7 @@ struct _ssl_ctl
 };
 
 static void send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_cert,
-				   const char *ssl_private_key, const char *ssl_dh_params,
-                                   const char *ssl_cipher_list);
+				   const char *ssl_private_key, const char *ssl_dh_params);
 static void send_init_prng(ssl_ctl_t * ctl, prng_seed_t seedtype, const char *path);
 
 
@@ -190,7 +189,7 @@ ssl_dead(ssl_ctl_t * ctl)
 	rb_kill(ctl->pid, SIGKILL);	/* make sure the process is really gone */
 	ilog(L_MAIN, "ssld helper died - attempting to restart");
 	sendto_realops_snomask(SNO_GENERAL, L_ALL, "ssld helper died - attempting to restart");
-	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params, ServerInfo.ssl_cipher_list);
+	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 }
 
 static void
@@ -218,12 +217,12 @@ restart_ssld_event(void *unused)
 		int start = ServerInfo.ssld_count - get_ssld_count();
 		ilog(L_MAIN, "Attempting to restart ssld processes");
 		sendto_realops_snomask(SNO_GENERAL, L_ALL, "Attempt to restart ssld processes");
-		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params, ServerInfo.ssl_cipher_list);
+		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 	}
 }
 
 int
-start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params, const char *ssl_cipher_list)
+start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
 	rb_fde_t *F1, *F2;
 	rb_fde_t *P1, *P2;
@@ -329,8 +328,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		}
 		if(ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
 			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key,
-					       ssl_dh_params != NULL ? ssl_dh_params : "",
-                                               ssl_cipher_list != NULL ? ssl_cipher_list : "");
+					       ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
 
@@ -559,7 +557,7 @@ ssl_cmd_write_queue(ssl_ctl_t * ctl, rb_fde_t ** F, int count, const void *buf, 
 
 
 static void
-send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params, const char *ssl_cipher_list)
+send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
 	size_t len;
 
@@ -608,7 +606,7 @@ send_init_prng(ssl_ctl_t * ctl, prng_seed_t seedtype, const char *path)
 }
 
 void
-send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params, const char *ssl_cipher_list)
+send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
 	rb_dlink_node *ptr;
 	if(ssl_cert == NULL || ssl_private_key == NULL || ssl_dh_params == NULL)
@@ -619,7 +617,7 @@ send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
 		ssl_ctl_t *ctl = ptr->data;
-		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params, ssl_cipher_list);
+		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params);
 	}
 }
 
