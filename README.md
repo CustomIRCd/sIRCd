@@ -28,6 +28,6 @@ directions.
 ## Support
 
 The official channel for sIRCd is `#sIRCd` on
-`irc.letstalkcoding.net`. 
+`irc.chatfreedom.us`. 
 
 Please use ***GitHub issue tracker*** for any issues
