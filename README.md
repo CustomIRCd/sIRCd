@@ -17,10 +17,11 @@ Debian packages:
  - `flex`
  - `bison`
  - `build-essential`
+ - `pkg-config`
 
 ## Debian/ubuntu Users
 
-You should run `apt-get update` followed by `apt-get install libssl-dev flex bison build-essential`
+You should run `apt-get update` followed by `apt-get install libssl-dev flex bison build-essential pkg-config`
 
 Read the included documentation for detailed compilation and install
 directions.
