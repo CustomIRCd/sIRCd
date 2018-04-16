@@ -13,6 +13,8 @@ createauthonly.c - Only allow authenticated (identified) users to create
 
 ip_cloaking.c  - Cloak (spoof) the host for users that have umode +x.
 
+show_whois.c      - Spy on clients who WHOIS you seeing idle time (usermode +W).
+
 ip_cloaking_old.c - Cloak (spoof) the host for users that have umode +h.
 
 m_42.c         - The Answer to Life, the Universe, and Everything.
@@ -54,8 +56,6 @@ m_okick.c      - OKICK - Allows an oper to kick a user from a channel
                          regardless of if they have ops or not.
                  Syntax: OKICK <channel> <nick> :<message>
 
-m_roleplay.c	- ROLEPLAY - Allows a variety of roleplaying commands.
-
 no_oper_invis.c - Disallow opers setting marking themselves as invisible
                   (+i) unless they have the hidden_oper flag.
 
@@ -91,7 +91,6 @@ Snomask Modules
 sno_farconnect.c  - Remote client connect/exit notices (snomask +F)
 sno_globalkline.c - Global K/D/X-line activation notices
 sno_globaloper.c  - Global oper-up notices
-sno_whois.c       - Spy on clients who WHOIS you seeing idle time (snomask +W).
 
 Extban Modules
 --------------
@@ -103,3 +102,4 @@ extb_extgecos.so - Extended ban (+b $x:mask)
 extb_oper.so     - Oper bans (+b $o)
 extb_realname.so - Realname (gecos) bans (+b $r:mask)
 extb_server.so   - Server bans (+b $s:mask)
+extb_hostmask.so - Host bans (+b $h:mask)

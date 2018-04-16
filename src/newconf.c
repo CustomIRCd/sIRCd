@@ -306,8 +306,8 @@ static struct mode_table umode_table[] = {
 	{"noforward",	UMODE_NOFORWARD	},
 	{"regonlymsg",	UMODE_REGONLYMSG},
 	{"sslonlymsg",	UMODE_SSLONLYMSG},
-        {"oponlymsg",   UMODE_OPONLYMSG },
-	{"servnotice",	UMODE_SERVNOTICE},
+	{"staffonlymsg", UMODE_STAFFONLYMSG},
+        {"servnotice",	UMODE_SERVNOTICE},
 	{"wallop",	UMODE_WALLOP	},
 	{"operwall",	UMODE_OPERWALL	},
 	{"noctcp",	UMODE_NOCTCP	},
@@ -320,6 +320,7 @@ static struct mode_table umode_table[] = {
 
 static struct mode_table oper_table[] = {
 	{"encrypted",		OPER_ENCRYPTED		},
+        {"vhost_auth",		OPER_VHOSTAUTH		},
 	{"need_ssl",		OPER_NEEDSSL		},
 	{NULL, 0}
 };
@@ -1331,14 +1332,6 @@ conf_end_connect(struct TopConf *tc)
 		return 0;
 	}
 
-#ifndef HAVE_LIBZ
-	if(ServerConfCompressed(yy_server))
-	{
-		conf_report_error("Ignoring connect::flags::compressed -- zlib not available.");
-		yy_server->flags &= ~SERVER_COMPRESSED;
-	}
-#endif
-
 	add_server_conf(yy_server);
 	rb_dlinkAdd(yy_server, &yy_server->node, &server_conf_list);
 
@@ -1624,19 +1617,7 @@ conf_set_general_stats_i_oper_only(void *data)
 static void
 conf_set_general_compression_level(void *data)
 {
-#ifdef HAVE_LIBZ
-	ConfigFileEntry.compression_level = *(unsigned int *) data;
-
-	if((ConfigFileEntry.compression_level < 1) || (ConfigFileEntry.compression_level > 9))
-	{
-		conf_report_error
-			("Invalid general::compression_level %d -- using default.",
-			 ConfigFileEntry.compression_level);
-		ConfigFileEntry.compression_level = 0;
-	}
-#else
 	conf_report_error("Ignoring general::compression_level -- zlib not available.");
-#endif
 }
 
 static void
@@ -2273,8 +2254,10 @@ static struct ConfEntry conf_general_table[] =
 	{ "kline_reason",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.kline_reason },
 	{ "identify_service",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.identifyservice },
 	{ "identify_command",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.identifycommand },
-
-	{ "anti_spam_exit_message_time", CF_TIME,  NULL, 0, &ConfigFileEntry.anti_spam_exit_message_time },
+        { "sasl_service",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.sasl_service },
+        { "static_parts", CF_YESNO, NULL, 0, &ConfigFileEntry.static_parts },
+	{ "static_part_reason", CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.static_part_reason },
+        { "anti_spam_exit_message_time", CF_TIME,  NULL, 0, &ConfigFileEntry.anti_spam_exit_message_time },
 	{ "use_part_messages",		CF_YESNO, NULL, 0, &ConfigFileEntry.use_part_messages	},
 	{ "disable_fake_channels",	 CF_YESNO, NULL, 0, &ConfigFileEntry.disable_fake_channels },
 	{ "hide_channel_below_users", CF_INT, NULL, 0, &ConfigFileEntry.hide_channel_below_users },
@@ -2339,7 +2322,7 @@ static struct ConfEntry conf_general_table[] =
         { "use_propagated_bans",CF_YESNO, NULL, 0, &ConfigFileEntry.use_propagated_bans	},
 	{ "expire_override_time",	CF_TIME, NULL, 0, &ConfigFileEntry.expire_override_time},
         { "away_interval",    CF_INT,   NULL, 0, &ConfigFileEntry.away_interval    },
-	{ "\0", 		0, 	  NULL, 0, NULL }
+        { "\0", 		0, 	  NULL, 0, NULL }
 };
 
 static struct ConfEntry conf_channel_table[] =
@@ -2366,7 +2349,8 @@ static struct ConfEntry conf_channel_table[] =
 	{ "use_halfop",		CF_YESNO, NULL, 0, &ConfigChannel.use_halfop		},
 	{ "use_admin",		CF_YESNO, NULL, 0, &ConfigChannel.use_admin		},
         { "use_owner",          CF_YESNO, NULL, 0, &ConfigChannel.use_owner             },
-	{ "use_except",		CF_YESNO, NULL, 0, &ConfigChannel.use_except		},
+	{ "can_self_devoice", CF_YESNO, NULL, 0, &ConfigChannel.can_self_devoice	},
+        { "use_except",		CF_YESNO, NULL, 0, &ConfigChannel.use_except		},
 	{ "use_invex",		CF_YESNO, NULL, 0, &ConfigChannel.use_invex		},
 	{ "use_knock",		CF_YESNO, NULL, 0, &ConfigChannel.use_knock		},
 	{ "use_forward",	CF_YESNO, NULL, 0, &ConfigChannel.use_forward		},

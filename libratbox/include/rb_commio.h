@@ -99,7 +99,7 @@ void rb_note(rb_fde_t *, const char *);
 #define RB_SELECT_ACCEPT		RB_SELECT_READ
 #define RB_SELECT_CONNECT		RB_SELECT_WRITE
 
-#define RB_SSL_CERTFP_LEN 20
+#define RB_SSL_CERTFP_LEN	20
 
 int rb_set_nb(rb_fde_t *);
 int rb_set_buffers(rb_fde_t *, int);

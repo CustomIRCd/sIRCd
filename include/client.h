@@ -100,16 +100,6 @@ struct Server
         char maskinfo;
 };
 
-struct ZipStats
-{
-	unsigned long long in;
-	unsigned long long in_wire;
-	unsigned long long out;
-	unsigned long long out_wire;
-	double in_ratio;
-	double out_ratio;
-};
-
 struct Client
 {
 	rb_dlink_node node;
@@ -279,9 +269,7 @@ struct LocalUser
 			      applicable to this client */
 
 	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
-	struct _ssl_ctl *z_ctl;			/* second ctl for ssl+zlib */
 	uint32_t localflags;
-	struct ZipStats *zipstats;		/* zipstats */
 	uint16_t cork_count;			/* used for corking/uncorking connections */
 	struct ev_entry *event;			/* used for associated events */
 
@@ -429,13 +417,14 @@ struct ListClient
 #define UMODE_SCALLERID    0x40000	/* soft caller id */
 #define UMODE_HIDECHANS    0x80000	/* hide channels in whois +H */
 #define UMODE_SSLONLYMSG   0x200000     /* only allow users using SSL to msg */
+#define UMODE_STAFFONLYMSG 0x400000	/* only allow logged in users to msg */
+#define UMODE_HIDEIDLE     0x800000     /* Hide idle from /whois */
 
 /* user information flags, only settable by remote mode or local oper */
 #define UMODE_OPER         0x1000	/* Operator */
 #define UMODE_ADMIN        0x2000	/* Admin on server */
 #define UMODE_SSLCLIENT    0x4000	/* using SSL */
 #define UMODE_WEBCLIENT    0x100000     /* user is connected via a web client */
-#define UMODE_OPONLYMSG    0x180000000  /* only allow IRC OPS to msg */
 #define UMODE_OVERRIDE     0x20000      /* able to override */
 
 #define IsOverride(x)      ((x)->umodes & UMODE_OVERRIDE)
@@ -547,12 +536,12 @@ struct ListClient
 #define IsNoForward(x)		((x)->umodes & UMODE_NOFORWARD)
 #define IsSetRegOnlyMsg(x)	((x)->umodes & UMODE_REGONLYMSG)
 #define IsSetSslOnlyMsg(x)	((x)->umodes & UMODE_SSLONLYMSG)
-#define IsSetOPOnlyMsg(x)       ((x)->umodes & UMODE_OPONLYMSG)
 #define IsSetNoCTCP(x)		((x)->umodes & UMODE_NOCTCP)
 #define IsSetNoInvite(x)	((x)->umodes & UMODE_NOINVITE)
 #define IsSetBot(x)		((x)->umodes & UMODE_BOT)
 #define IsWebClient(x)          ((x)->umodes & UMODE_WEBCLIENT)
 #define IsSetSCallerId(x)	((x)->umodes & UMODE_SCALLERID)
+#define IsSetStaffOnlyMsg(x)       ((x)->umodes & UMODE_STAFFONLYMSG)
 
 
 #define SetGotId(x)             ((x)->flags |= FLAGS_GOTID)

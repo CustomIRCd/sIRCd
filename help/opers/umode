@@ -5,7 +5,6 @@ User modes: (* designates that the umode is oper only)
 
      USERMODE     DESCRIPTION
 -----------------------------------------------------------------
-         +b     - Prevents non IRCOPs from messaging you.
          +i     - Designates this client 'invisible'.
          +g     - "caller id" mode only allow accept clients to message you
          +t     - Prevents non-SSL users you have not accepted from
@@ -16,6 +15,7 @@ User modes: (* designates that the umode is oper only)
                   Use the /oper command to attain this.
        * +a     - Is marked as a server admin in whois.
        * +l     - Can see oper locops (local wallops).
+         +m     - Prevents non IRCOPs from messaging you.
        * +s     - Can see server notices (see /quote help snomask).
        * +z     - Can see operwalls.
        * +p     - Override - gives you implicit operator access in all channels.
@@ -26,8 +26,9 @@ User modes: (* designates that the umode is oper only)
          +R     - Prevents non accept unidentified users from messaging you.
          +G     - "soft caller id" mode - same as +g but automatically allows
                   anyone who's in a common channel with you to message you.
+         +I     - Hide idle from WHOIS
          +V     - Prevents you from receiving invites.
-         +W     - Is connected via a web client (set only on connection).
+         +X     - Is connected via a web client (set only on connection).
          +H     - Prevents non-opers from seeing your channel list in
                   a whois query.
          +Z     - Is connected via SSL (set only on connection).

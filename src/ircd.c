@@ -107,7 +107,6 @@ int kline_queued = 0;
 int server_state_foreground = 0;
 int opers_see_all_users = 0;
 int ssl_ok = 0;
-int zlib_ok = 1;
 
 int testing_conf = 0;
 time_t startup_time;
@@ -741,7 +740,6 @@ main(int argc, char *argv[])
 	add_to_client_hash(me.name, &me);
 	add_to_id_hash(me.id, &me);
 	me.serv->nameinfo = scache_connect(me.name, me.info, 0);
-        me.serv->maskinfo = scache_connect(me.mname, me.info, 0);
 
 	rb_dlinkAddAlloc(&me, &global_serv_list);
 

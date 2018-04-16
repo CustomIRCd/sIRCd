@@ -840,7 +840,7 @@ msg_client(int p_or_n, const char *command,
 	if(MyClient(target_p))
 	{
 		if (IsSetNoCTCP(target_p) && p_or_n != NOTICE && *text == '\001' && strncasecmp(text + 1, "ACTION", 6))
-		{   
+		{
 			    sendto_one_numeric(source_p, ERR_NOCTCP,
 			            form_str(ERR_NOCTCP),
 			            target_p->name);
@@ -849,7 +849,7 @@ msg_client(int p_or_n, const char *command,
 		else if(!IsServer(source_p) && !IsService(source_p) && (IsSetCallerId(target_p) ||
 					(IsSetSCallerId(target_p) && !has_common_channel(source_p, target_p)) ||
                                         (IsSetRegOnlyMsg(target_p) && !source_p->user->suser[0]) ||
-                                        (IsSetOPOnlyMsg(target_p) && !IsOper(source_p)) ||
+                                        (IsSetStaffOnlyMsg(target_p) && !IsOper(source_p)) ||
                         (IsSetSslOnlyMsg(target_p) && !IsSSLClient(source_p)))
 			)
 		{
@@ -888,11 +888,12 @@ msg_client(int p_or_n, const char *command,
 							form_str(ERR_NONONSSL),
 							target_p->name);
 			}
-                        else if (IsSetOPOnlyMsg(target_p) && !IsOper(source_p))
+                        else if (IsSetStaffOnlyMsg(target_p) && !IsOper(source_p))
                         {
                                 if (p_or_n != NOTICE)
-                                        sendto_one(source_p, ":%s!%s@%s PRIVMSG %s :I am not accepting messages from non IRCOPS.",
-                                                   target_p->name, target_p->username, target_p->host, source_p->name);
+                                        sendto_one_numeric(source_p, ERR_NONONOP,
+                                                        form_str(ERR_NONONOP),
+                                                        target_p->name);
                         }
 			else if (IsSetSCallerId(target_p) && !has_common_channel(source_p, target_p))
 			{

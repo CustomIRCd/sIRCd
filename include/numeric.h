@@ -51,6 +51,7 @@ extern const char *form_str(int);
 #define RPL_MAP		     15	/* Undernet extension */
 #define RPL_MAPMORE	     16	/* Undernet extension */
 #define RPL_MAPEND	     17	/* Undernet extension */
+#define RPL_YOURID           42 /* From ircnet */
 #define RPL_SAVENICK         43 /* From ircnet */
 
 /*
@@ -310,7 +311,7 @@ extern const char *form_str(int);
 #define ERR_NOCTCP	     492
 #define ERR_NONONSSL         493
 #define ERR_KICKNOREJOIN     495
-
+#define ERR_NONONOP          496
 #define ERR_OWNMODE          494 /* from bahamut -- jilles */
 
 #define ERR_UMODEUNKNOWNFLAG 501
@@ -333,6 +334,7 @@ extern const char *form_str(int);
 
 #define RPL_WHOISSECURE      671 /* Unreal3.2 --nenolod */
 #define RPL_WHOISWEBIRC      672 /* plexus -- XE */
+#define RPL_WHOISYOURID      674 /* Show EUID in WHOIS */
 #define RPL_MODLIST          702
 #define RPL_ENDOFMODLIST     703
 

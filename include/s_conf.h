@@ -151,9 +151,12 @@ struct config_file_entry
 	char *servicestring;
 	char *kline_reason;
         char *custom_cloak; /* used with old_cloaking */
+        int static_parts;
+	char *static_part_reason;
 
 	char *identifyservice;
 	char *identifycommand;
+        char *sasl_service;
 	char *fname_userlog;
 	char *fname_fuserlog;
 	char *fname_operlog;
@@ -234,7 +237,7 @@ struct config_file_entry
 	int operhide;
         int servermask;
         int use_propagated_bans;
-	int secret_channels_in_whois;
+        int secret_channels_in_whois;
 	int expire_override_time;
     int away_interval;
 };
@@ -249,7 +252,8 @@ struct config_channel_entry
 	int use_halfop;
 	int use_admin;
         int use_owner;
-	int use_except;
+        int can_self_devoice;
+        int use_except;
 	int use_invex;
 	int use_knock;
 	int use_forward;

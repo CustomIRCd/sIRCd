@@ -698,8 +698,11 @@ set_default_conf(void)
 	ConfigFileEntry.default_operhost = rb_strdup("");
 	ConfigFileEntry.static_quit = rb_strdup("");
 	ConfigFileEntry.servicestring = rb_strdup("is a Network Service");
+        ConfigFileEntry.sasl_service = rb_strdup("SaslServ");
+        ConfigFileEntry.static_parts = NO;
+	ConfigFileEntry.static_part_reason = NULL;
 
-	ConfigFileEntry.default_umodes = UMODE_INVISIBLE;	
+	ConfigFileEntry.default_umodes = UMODE_INVISIBLE;
 	ConfigFileEntry.failed_oper_notice = YES;
 	ConfigFileEntry.anti_nick_flood = NO;
 	ConfigFileEntry.disable_fake_channels = NO;
@@ -761,9 +764,6 @@ set_default_conf(void)
 	ConfigFileEntry.secret_channels_in_whois = NO;
     ConfigFileEntry.away_interval = 30;
 
-#ifdef HAVE_LIBZ
-	ConfigFileEntry.compression_level = 4;
-#endif
 
 	ConfigFileEntry.oper_umodes = UMODE_LOCOPS | UMODE_SERVNOTICE |
 		UMODE_OPERWALL | UMODE_WALLOP;
@@ -778,7 +778,8 @@ set_default_conf(void)
 	ConfigChannel.use_halfop = YES;
 	ConfigChannel.use_admin = YES;
         ConfigChannel.use_owner = YES;
-	ConfigChannel.use_except = YES;
+	ConfigChannel.can_self_devoice = YES;
+        ConfigChannel.use_except = YES;
 	ConfigChannel.use_invex = YES;
 	ConfigChannel.use_knock = YES;
 	ConfigChannel.use_forward = YES;
@@ -829,8 +830,7 @@ set_default_conf(void)
         ConfigFileEntry.operhide = 0;
         ConfigFileEntry.servermask = 0;
 	ConfigFileEntry.expire_override_time = 300;
-
-	ServerInfo.default_max_clients = MAXCONNECTIONS;
+        ServerInfo.default_max_clients = MAXCONNECTIONS;
 
 	if (!alias_dict)
 		alias_dict = irc_dictionary_create(strcasecmp);
@@ -875,6 +875,9 @@ validate_conf(void)
 	if(ServerInfo.mask_name == NULL)
 		ServerInfo.mask_name = rb_strdup(SERVER_NAME_MASK_DEFAULT);
 
+	if (ConfigFileEntry.static_part_reason == NULL)
+		ConfigFileEntry.static_part_reason = rb_strdup("");
+
       if(ServerInfo.ssld_count < 1)
 		ServerInfo.ssld_count = 1;
 
@@ -892,7 +895,7 @@ validate_conf(void)
 		int start = ServerInfo.ssld_count - get_ssld_count();
 		/* start up additional ssld if needed */
 		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
-				
+
 	}
 
 	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) ||
@@ -1665,6 +1668,8 @@ clear_out_old_conf(void)
 	ConfigFileEntry.kline_reason = NULL;
         rb_free(ConfigFileEntry.custom_cloak);
         ConfigFileEntry.custom_cloak = NULL;
+        rb_free(ConfigFileEntry.sasl_service);
+	ConfigFileEntry.sasl_service = NULL;
 
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
