@@ -3,6 +3,10 @@
 ## Changes since Version 1.0.9-2
 
 - [] - Add fake /list
+- [X] - Re-enable away-notify
+- [X] - add support for IRCv3.2 userhost-in-names
+- [X] - allow the CharAttrs table to be modified at runtime
+- [X] - notify public users the OPER that killed the user
 
 ## Changes since Version 1.0.9-1
 
