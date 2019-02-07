@@ -102,11 +102,11 @@ static uint16_t
 get_listener_port(const struct Listener *listener)
 {
 #ifdef RB_IPV6
-	if(listener->addr.ss_family == AF_INET6)
-		return ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
-	else
+    if(listener->addr.ss_family == AF_INET6)
+        return ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
+    else
 #endif
-		return ntohs(((const struct sockaddr_in *)&listener->addr)->sin_port);
+        return ntohs(((const struct sockaddr_in *)&listener->addr)->sin_port);
 }
 
 /*
@@ -122,8 +122,8 @@ get_listener_name(const struct Listener *listener)
     if(listener == NULL)
         return NULL;
 
-	rb_snprintf(buf, sizeof(buf), "%s[%s/%u]",
-			me.name, listener->name, get_listener_port(listener));
+    rb_snprintf(buf, sizeof(buf), "%s[%s/%u]",
+                me.name, listener->name, get_listener_port(listener));
     return buf;
 }
 
@@ -140,8 +140,8 @@ show_ports(struct Client *source_p)
 
     for (listener = ListenerPollList; listener; listener = listener->next) {
         sendto_one_numeric(source_p, RPL_STATSPLINE,
-	form_str(RPL_STATSPLINE), 'P',
-			   get_listener_port(listener),
+                           form_str(RPL_STATSPLINE), 'P',
+                           get_listener_port(listener),
                            IsOperAdmin(source_p) ? listener->name : me.name,
                            listener->ref_count, (listener->active) ? "active" : "disabled",
                            listener->ssl ? " ssl" : "");
@@ -166,7 +166,7 @@ inetport(struct Listener *listener)
 {
     rb_fde_t *F;
     int opt = 1;
-	const char *errstr;
+    const char *errstr;
 
     /*
      * At first, open a new socket
@@ -193,18 +193,18 @@ inetport(struct Listener *listener)
 
     if(F == NULL) {
         sendto_realops_snomask(SNO_GENERAL, L_ALL,
-				"Cannot open socket for listener on port %d",
-				get_listener_port(listener));
-		ilog(L_MAIN, "Cannot open socket for listener %s",
-				get_listener_name(listener));
+                               "Cannot open socket for listener on port %d",
+                               get_listener_port(listener));
+        ilog(L_MAIN, "Cannot open socket for listener %s",
+             get_listener_name(listener));
         return 0;
     } else if((maxconnections - 10) < rb_get_fd(F)) { /* XXX this is kinda bogus*/
         ilog_error("no more connections left for listener");
-	sendto_realops_snomask(SNO_GENERAL, L_ALL,
-				"No more connections left for listener on port %d",
-				get_listener_port(listener));
-		ilog(L_MAIN, "No more connections left for listener %s",
-				get_listener_name(listener));
+        sendto_realops_snomask(SNO_GENERAL, L_ALL,
+                               "No more connections left for listener on port %d",
+                               get_listener_port(listener));
+        ilog(L_MAIN, "No more connections left for listener %s",
+             get_listener_name(listener));
         rb_close(F);
         return 0;
     }
@@ -215,11 +215,11 @@ inetport(struct Listener *listener)
      */
     if(setsockopt(rb_get_fd(F), SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt))) {
         errstr = strerror(rb_get_sockerr(F));
-		sendto_realops_snomask(SNO_GENERAL, L_ALL,
-				"Cannot set SO_REUSEADDR for listener on port %d: %s",
-				get_listener_port(listener), errstr);
-		ilog(L_MAIN, "Cannot set SO_REUSEADDR for listener %s: %s",
-				get_listener_name(listener), errstr);
+        sendto_realops_snomask(SNO_GENERAL, L_ALL,
+                               "Cannot set SO_REUSEADDR for listener on port %d: %s",
+                               get_listener_port(listener), errstr);
+        ilog(L_MAIN, "Cannot set SO_REUSEADDR for listener %s: %s",
+             get_listener_name(listener), errstr);
         rb_close(F);
         return 0;
     }
@@ -231,22 +231,22 @@ inetport(struct Listener *listener)
 
     if(bind(rb_get_fd(F), (struct sockaddr *) &listener->addr, GET_SS_LEN(&listener->addr))) {
         errstr = strerror(rb_get_sockerr(F));
-		sendto_realops_snomask(SNO_GENERAL, L_ALL,
-				"Cannot bind for listener on port %d: %s",
-				get_listener_port(listener), errstr);
-		ilog(L_MAIN, "Cannot bind for listener %s: %s",
-				get_listener_name(listener), errstr);
+        sendto_realops_snomask(SNO_GENERAL, L_ALL,
+                               "Cannot bind for listener on port %d: %s",
+                               get_listener_port(listener), errstr);
+        ilog(L_MAIN, "Cannot bind for listener %s: %s",
+             get_listener_name(listener), errstr);
         rb_close(F);
         return 0;
     }
 
     if(rb_listen(F, RATBOX_SOMAXCONN, listener->defer_accept)) {
         errstr = strerror(rb_get_sockerr(F));
-		sendto_realops_snomask(SNO_GENERAL, L_ALL,
-				"Cannot listen() for listener on port %d: %s",
-				get_listener_port(listener), errstr);
-		ilog(L_MAIN, "Cannot listen() for listener %s: %s",
-				get_listener_name(listener), errstr);
+        sendto_realops_snomask(SNO_GENERAL, L_ALL,
+                               "Cannot listen() for listener on port %d: %s",
+                               get_listener_port(listener), errstr);
+        ilog(L_MAIN, "Cannot listen() for listener %s: %s",
+             get_listener_name(listener), errstr);
         rb_close(F);
         return 0;
     }
