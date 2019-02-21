@@ -97,6 +97,9 @@ do_ssl_handshake(rb_fde_t *F, PF * callback, void *data)
 	ret = mbedtls_ssl_handshake(SSL_P(F));
 	if(ret < 0)
 	{
+		if (ret == -1 && rb_ignore_errno(errno))
+			ret = MBEDTLS_ERR_SSL_WANT_READ;
+
 		if((ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE))
 		{
 			if(ret == MBEDTLS_ERR_SSL_WANT_READ)
@@ -106,6 +109,7 @@ do_ssl_handshake(rb_fde_t *F, PF * callback, void *data)
 			rb_setselect(F, flags, callback, data);
 			return 0;
 		}
+
 		F->ssl_errno = ret;
 		return -1;
 	}
@@ -142,17 +146,27 @@ rb_ssl_tryaccept(rb_fde_t *F, void *data)
 static int
 rb_ssl_read_cb(void *opaque, unsigned char *buf, size_t size)
 {
+	int ret;
 	rb_fde_t *F = opaque;
 
-	return read(F->fd, buf, size);
+	ret = read(F->fd, buf, size);
+	if (ret < 0 && rb_ignore_errno(errno))
+		return MBEDTLS_ERR_SSL_WANT_READ;
+
+	return ret;
 }
 
 static int
 rb_ssl_write_cb(void *opaque, const unsigned char *buf, size_t size)
 {
 	rb_fde_t *F = opaque;
+	int ret;
 
-	return write(F->fd, buf, size);
+	ret = write(F->fd, buf, size);
+	if (ret < 0 && rb_ignore_errno(errno))
+		return MBEDTLS_ERR_SSL_WANT_WRITE;
+
+	return ret;
 }
 
 static void
@@ -190,6 +204,7 @@ rb_ssl_start_accepted(rb_fde_t *new_F, ACCB * cb, void *data, int timeout)
 	{
 		struct acceptdata *ad = new_F->accept;
 		new_F->accept = NULL;
+
 		ad->callback(new_F, RB_OK, (struct sockaddr *)&ad->S, ad->addrlen, ad->data);
 		rb_free(ad);
 	}
@@ -213,6 +228,7 @@ rb_ssl_accept_setup(rb_fde_t *F, rb_fde_t *new_F, struct sockaddr *st, int addrl
 	{
 		struct acceptdata *ad = F->accept;
 		F->accept = NULL;
+
 		ad->callback(F, RB_OK, (struct sockaddr *)&ad->S, ad->addrlen, ad->data);
 		rb_free(ad);
 	}
@@ -298,7 +314,8 @@ rb_init_ssl(void)
 		return 0;
 	}
 
-	mbedtls_ssl_conf_rng(&serv_config, mbedtls_ctr_drbg_random, &ctr_drbg);
+	mbedtls_ssl_conf_rng(&client_config, mbedtls_ctr_drbg_random, &ctr_drbg);
+	mbedtls_ssl_conf_authmode(&client_config, MBEDTLS_SSL_VERIFY_NONE);
 
 	return 1;
 }
@@ -312,7 +329,7 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 	ret = mbedtls_x509_crt_parse_file(&x509, cert);
 	if (ret != 0)
 	{
-		rb_lib_log("rb_setup_ssl_server: failed to parse certificate '%s': -0x%x", -ret);
+		rb_lib_log("rb_setup_ssl_server: failed to parse certificate '%s': -0x%x", cert, -ret);
 		return 0;
 	}
 
@@ -320,7 +337,7 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 	ret = mbedtls_pk_parse_keyfile(&serv_pk, keyfile, NULL);
 	if (ret != 0)
 	{
-		rb_lib_log("rb_setup_ssl_server: failed to parse private key '%s': -0x%x", -ret);
+		rb_lib_log("rb_setup_ssl_server: failed to parse private key '%s': -0x%x", keyfile, -ret);
 		return 0;
 	}
 
@@ -328,7 +345,7 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 	ret = mbedtls_dhm_parse_dhmfile(&dh_params, dhfile);
 	if (ret != 0)
 	{
-		rb_lib_log("rb_setup_ssl_server: failed to parse DH parameters '%s': -0x%x", -ret);
+		rb_lib_log("rb_setup_ssl_server: failed to parse DH parameters '%s': -0x%x", dhfile, -ret);
 		return 0;
 	}
 
@@ -340,9 +357,18 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 	}
 
 	if (x509.next)
+	{
 		mbedtls_ssl_conf_ca_chain(&serv_config, x509.next, NULL);
+		mbedtls_ssl_conf_ca_chain(&client_config, x509.next, NULL);
+	}
 
 	if ((ret = mbedtls_ssl_conf_own_cert(&serv_config, &x509, &serv_pk)) != 0)
+	{
+		rb_lib_log("rb_setup_ssl_server: failed to set up own certificate: -0x%x", -ret);
+		return 0;
+	}
+
+	if ((ret = mbedtls_ssl_conf_own_cert(&client_config, &x509, &serv_pk)) != 0)
 	{
 		rb_lib_log("rb_setup_ssl_server: failed to set up own certificate: -0x%x", -ret);
 		return 0;
@@ -513,51 +539,27 @@ int
 rb_get_ssl_certfp(rb_fde_t *F, uint8_t certfp[RB_SSL_CERTFP_LEN])
 {
 	const mbedtls_x509_crt *peer_cert;
+	uint8_t hash[RB_SSL_CERTFP_LEN];
+	const mbedtls_md_info_t *md_info;
+	int ret;
 
 	peer_cert = mbedtls_ssl_get_peer_cert(SSL_P(F));
 	if (peer_cert == NULL)
 		return 0;
 
-	return 0;
-#if 0
-	gnutls_x509_crt_t cert;
-	unsigned int cert_list_size;
-	const gnutls_datum_t *cert_list;
-	uint8_t digest[RB_SSL_CERTFP_LEN * 2];
-	size_t digest_size;
-
-	if (gnutls_certificate_type_get(SSL_P(F)) != GNUTLS_CRT_X509)
+	md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA1);
+	if (md_info == NULL)
 		return 0;
 
-	if (gnutls_x509_crt_init(&cert) < 0)
-		return 0;
-
-	cert_list_size = 0;
-	cert_list = gnutls_certificate_get_peers(SSL_P(F), &cert_list_size);
-	if (cert_list == NULL)
+	if ((ret = mbedtls_md(md_info, peer_cert->raw.p, peer_cert->raw.len, hash)) != 0)
 	{
-		gnutls_x509_crt_deinit(cert);
+		rb_lib_log("rb_get_ssl_certfp: unable to get certfp for F: %p, -0x%x", -ret);
 		return 0;
 	}
 
-	if (gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0)
-	{
-		gnutls_x509_crt_deinit(cert);
-		return 0;
-	}
+	memcpy(certfp, hash, RB_SSL_CERTFP_LEN);
 
-	if (gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1, digest, &digest_size) < 0)
-	{
-		gnutls_x509_crt_deinit(cert);
-		return 0;
-	}
-
-	memcpy(certfp, digest, RB_SSL_CERTFP_LEN);
-
-	gnutls_x509_crt_deinit(cert);
 	return 1;
-#endif
-
 }
 
 int
