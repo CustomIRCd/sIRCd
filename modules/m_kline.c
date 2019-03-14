@@ -207,14 +207,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
     else
         apply_kline(source_p, aconf, reason, oper_reason);
 
-    if(ConfigFileEntry.kline_delay) {
-        if(kline_queued == 0) {
-            rb_event_addonce("check_klines", check_klines_event, NULL,
-                             ConfigFileEntry.kline_delay);
-            kline_queued = 1;
-        }
-    } else
-        check_klines();
+    check_klines();
 
     return 0;
 }
@@ -314,14 +307,7 @@ handle_remote_kline(struct Client *source_p, int tkline_time,
     else
         apply_kline(source_p, aconf, reason, oper_reason);
 
-    if(ConfigFileEntry.kline_delay) {
-        if(kline_queued == 0) {
-            rb_event_addonce("check_klines", check_klines_event, NULL,
-                             ConfigFileEntry.kline_delay);
-            kline_queued = 1;
-        }
-    } else
-        check_klines();
+    check_klines();
 
     return;
 }

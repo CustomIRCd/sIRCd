@@ -264,21 +264,13 @@ ms_ban(struct Client *client_p, struct Client *source_p, int parc, const char *p
      */
     switch (ntype) {
     case CONF_KILL:
-        if (aconf->status & CONF_ILLEGAL)
-            remove_reject_mask(aconf->user, aconf->host);
-        else {
-            add_conf_by_address(aconf->host, CONF_KILL, aconf->user, NULL, aconf);
-            if(ConfigFileEntry.kline_delay ||
-               (IsServer(source_p) &&
-                !HasSentEob(source_p))) {
-                if(kline_queued == 0) {
-                    rb_event_addonce("check_klines", check_klines_event, NULL,
-                                     ConfigFileEntry.kline_delay);
-                    kline_queued = 1;
-                }
-            } else
-                check_klines();
-        }
+			if (aconf->status & CONF_ILLEGAL)
+				remove_reject_mask(aconf->user, aconf->host);
+			else
+			{
+				add_conf_by_address(aconf->host, CONF_KILL, aconf->user, NULL, aconf);
+				check_klines();
+			}
         break;
     case CONF_XLINE:
         if (aconf->status & CONF_ILLEGAL)
