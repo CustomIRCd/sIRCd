@@ -1,8 +1,18 @@
 # sIRCd Changes
 
+## Changes since Version 1.1.0
+
+- [X] - Add option to immediately apply nick RESVs by FNC'ing
+- [X] - Various Fixes
+- [X] - Add support for multiple forms of blacklist queries using matches
+- [X] - Updated sqlite3 to 3.12.0
+- [X] - Fix memory leaks and clean up code a bit.
+- [X] - Add mbedtls implementation
+- [X] - Remove kline_delay config option
+- [X] - Tidy up daemonisation
+
 ## Changes since Version 1.0.9-2
 
-- [] - Add fake /list
 - [X] - Re-enable away-notify
 - [X] - add support for IRCv3.2 userhost-in-names
 - [X] - allow the CharAttrs table to be modified at runtime
