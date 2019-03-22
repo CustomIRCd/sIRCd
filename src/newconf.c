@@ -852,10 +852,11 @@ conf_set_listen_port_both(void *data, int ssl)
             ("listener::port argument is not an integer " "-- ignoring.");
             continue;
         }
+        conf_report_error("sctp is %s, ssl is %s, port is %d", sctp?"ON":"OFF", ssl?"ON":"OFF", args->v.number);
         if(listener_address == NULL) {
-            add_listener(args->v.number, listener_address, AF_INET, ssl, ssl || yy_defer_accept);
+            add_listener(args->v.number, listener_address, AF_INET, ssl, ssl || yy_defer_accept, sctp);
 #ifdef RB_IPV6
-            add_listener(args->v.number, listener_address, AF_INET6, ssl, ssl || yy_defer_accept);
+            add_listener(args->v.number, listener_address, AF_INET6, ssl, ssl || yy_defer_accept, sctp);
 #endif
         } else {
             int family;
@@ -866,7 +867,7 @@ conf_set_listen_port_both(void *data, int ssl)
 #endif
                 family = AF_INET;
 
-            add_listener(args->v.number, listener_address, family, ssl, ssl || yy_defer_accept);
+            add_listener(args->v.number, listener_address, family, ssl, ssl || yy_defer_accept, sctp);
 
         }
 
@@ -2349,6 +2350,8 @@ newconf_init()
     add_conf_item("listen", "defer_accept", CF_YESNO, conf_set_listen_defer_accept);
     add_conf_item("listen", "port", CF_INT | CF_FLIST, conf_set_listen_port);
     add_conf_item("listen", "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport);
+    add_conf_item("listen", "sctpport", CF_INT | CF_FLIST, conf_set_listen_sctpport);
+    add_conf_item("listen", "sctpsslport", CF_INT | CF_FLIST, conf_set_listen_sctpsslport);
     add_conf_item("listen", "ip", CF_QSTRING, conf_set_listen_address);
     add_conf_item("listen", "host", CF_QSTRING, conf_set_listen_address);
 

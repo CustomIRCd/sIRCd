@@ -38,13 +38,22 @@ struct Listener
 	int ref_count;		/* number of connection references */
 	int active;		/* current state of listener */
 	int ssl;		/* ssl listener */
-	int defer_accept;       /* use TCP_DEFER_ACCEPT */
+	int sctp;		// sctp listener
+        int defer_accept;       /* use TCP_DEFER_ACCEPT */
 	struct rb_sockaddr_storage addr;
 	struct DNSQuery *dns_query;
 	char vhost[HOSTLEN + 1];	/* virtual name of listener */
 };
 
-extern void add_listener(int port, const char *vaddr_ip, int family, int ssl, int defer_accept);
+#define LISTENFLAG_DEFER	0x00000008	// Listener defers accepting.
+
+#define ListenerIsSSL(l)	( ( (l)->flags & LISTENFLAG_SSL ) != 0x0 )
+#define ListenerIsSCTP(l)	( ( (l)->flags & LISTENFLAG_SCTP ) != 0x0 )
+#define ListenerIsSCTP(l)	( (l)->sctp > 0 )
+#define ListenerIsActive(l)	( ( (l)->flags & LISTENFLAG_ACTIVE ) != 0x0 )
+#define ListenerDefersAccept(l)	( ( (l)->flags & LISTENFLAG_DEFER ) != 0x0 )
+
+extern void add_listener(int port, const char *vaddr_ip, int family, int ssl, int defer_accept, int sctp);
 extern void close_listener(struct Listener *listener);
 extern void close_listeners(void);
 extern const char *get_listener_name(const struct Listener *listener);
