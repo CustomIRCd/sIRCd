@@ -319,6 +319,17 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
                                IsService(target_p) ? ConfigFileEntry.servicestring :
                                (IsAdmin(target_p) ? GlobalSetOptions.adminstring :
                                 GlobalSetOptions.operstring));
+
+/* Show the oper block name and the privset name used. */
+        if(MyClient(target_p) && !EmptyString(target_p->localClient->opername) &&
+           ((source_p == target_p) || IsOper(source_p) || IsOperAdmin(source_p))) {
+            char buf[BUFSIZE];
+            rb_snprintf(buf, sizeof(buf), "is opered as: %s",
+                        target_p->localClient->opername);
+            sendto_one_numeric(source_p, RPL_WHOISSPECIAL, form_str(RPL_WHOISSPECIAL),
+                               target_p->name, buf);
+        }
+
         if((md = user_metadata_find(target_p, "SWHOIS")) != NULL)
             sendto_one_numeric(source_p, 320, "%s :%s", target_p->name, md->value);
     }
