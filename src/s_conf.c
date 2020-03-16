@@ -1379,7 +1379,8 @@ get_user_ban_reason(struct ConfItem *aconf)
 {
     static char reasonbuf[BUFSIZE];
 
-    if (aconf->flags & CONF_FLAGS_TEMPORARY &&
+    if (!ConfigFileEntry.hide_tkdline_duration &&
+			aconf->flags & CONF_FLAGS_TEMPORARY &&
         (aconf->status == CONF_KILL || aconf->status == CONF_DLINE))
         rb_snprintf(reasonbuf, sizeof reasonbuf,
                     "Temporary %c-line %d min. - ",

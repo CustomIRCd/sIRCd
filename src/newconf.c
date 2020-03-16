@@ -2209,6 +2209,7 @@ static struct ConfEntry conf_general_table[] =
 	{ "static_quit",	CF_QSTRING, NULL, REALLEN,	  &ConfigFileEntry.static_quit	},
 	{ "servicestring",	CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.servicestring },
 	{ "kline_reason",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.kline_reason },
+	{ "hide_tkdline_duration",	CF_YESNO, NULL, 0, &ConfigFileEntry.hide_tkdline_duration	},
 	{ "identify_service",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.identifyservice },
 	{ "identify_command",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.identifycommand },
         { "sasl_service",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.sasl_service },
