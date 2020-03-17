@@ -1,5 +1,10 @@
 # sIRCd Changes
 
+## Changes since Version 1.1.1
+
+- [X] - Import the code from ircd-seven to show the oper name and server used
+- [X] - Add config option to hide durations of temporary K/D-lines
+
 ## Changes since Version 1.1.0
 
 - [X] - Add option to immediately apply nick RESVs by FNC'ing
