@@ -536,21 +536,21 @@ sendto_channel_opmod(struct Client *one, struct Client *source_p,
     if(IsServer(source_p))
         rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
                           ":%s %s %s%s :%s",
-			       source_p->name, command, cprivmsg_prefix, chptr->chname, text);
+                          source_p->name, command, cprivmsg_prefix, chptr->chname, text);
     else
         rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
                           ":%s!%s@%s %s %s%s :%s",
-			       source_p->name, source_p->username, source_p->host,
-			       command, cprivmsg_prefix, chptr->chname, text);
+                          source_p->name, source_p->username, source_p->host,
+                          command, cprivmsg_prefix, chptr->chname, text);
 
     if (chptr->mode.mode & MODE_MODERATED)
         rb_linebuf_putmsg(&rb_linebuf_old, NULL, NULL,
                           ":%s %s %s%s :%s",
-			       use_id(source_p), command, cprivmsg_prefix, chptr->chname, text);
+                          use_id(source_p), command, cprivmsg_prefix, chptr->chname, text);
     else
         rb_linebuf_putmsg(&rb_linebuf_old, NULL, NULL,
                           ":%s NOTICE %s%s :<%s:%s> %s",
-			       use_id(source_p->servptr), cprivmsg_prefix, chptr->chname,
+                          use_id(source_p->servptr), cprivmsg_prefix, chptr->chname,
                           source_p->name, chptr->chname, text);
     rb_linebuf_putmsg(&rb_linebuf_new, NULL, NULL,
                       ":%s %s =%s :%s",
