@@ -207,7 +207,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
     else
         apply_kline(source_p, aconf, reason, oper_reason);
 
-    check_klines();
+    check_one_kline(aconf);
 
     return 0;
 }
@@ -307,7 +307,7 @@ handle_remote_kline(struct Client *source_p, int tkline_time,
     else
         apply_kline(source_p, aconf, reason, oper_reason);
 
-    check_klines();
+    check_one_kline(aconf);
 
     return;
 }

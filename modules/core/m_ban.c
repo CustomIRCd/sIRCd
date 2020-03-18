@@ -35,6 +35,7 @@
 #include "config.h"
 #include "ircd.h"
 #include "match.h"
+#include "numeric.h"
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "msg.h"
@@ -269,7 +270,7 @@ ms_ban(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			else
 			{
 				add_conf_by_address(aconf->host, CONF_KILL, aconf->user, NULL, aconf);
-				check_klines();
+				check_one_kline(aconf);
 			}
         break;
     case CONF_XLINE:

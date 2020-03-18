@@ -2,6 +2,7 @@
 #include "modules.h"
 #include "hook.h"
 #include "client.h"
+#include "hostmask.h"
 #include "ircd.h"
 #include "send.h"
 #include "hash.h"
@@ -57,7 +58,7 @@ check_new_user(void *vdata)
     int needhash = 0;
 
     for (char *src = source_p->user->suser; *src ; src++ ) {
-        if (dst > buf + sizeof(buf)) {
+        if (dst >= buf + sizeof(buf)) {
             /* Doesn't fit. Warn opers and bail. */
             sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
                                    "Couldn't fit account name part %s in hostname for %s!%s@%s",
@@ -100,4 +101,25 @@ check_new_user(void *vdata)
     if (0 == irccmp(source_p->host, source_p->orighost))
         change_nick_user_host(source_p, source_p->name, source_p->username, buf, 0, "Changing host");
     strncpy(source_p->orighost, buf, HOSTLEN);
+
+    {
+        struct ConfItem *aconf = find_kline(source_p);
+
+        if(aconf == NULL)
+            return;
+
+        if(IsExemptKline(source_p)) {
+            sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
+                                   "KLINE over-ruled for %s, client is kline_exempt [%s@%s]",
+                                   get_client_name(source_p, HIDE_IP),
+                                   aconf->user, aconf->host);
+            return;
+        }
+
+        sendto_realops_snomask(SNO_GENERAL, L_ALL,
+                               "KLINE active for %s",
+                               get_client_name(source_p, HIDE_IP));
+
+        notify_banned_client(source_p, aconf, K_LINED);
+    }
 }

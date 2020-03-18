@@ -593,6 +593,12 @@ struct ListClient
 #define SHOW_IP 1
 #define MASK_IP 2
 
+enum
+{
+	D_LINED,
+	K_LINED
+};
+
 extern void check_banned_lines(void);
 extern void check_klines_event(void *unused);
 extern void check_klines(void);
@@ -608,6 +614,7 @@ extern struct Client *make_client(struct Client *from);
 extern void free_pre_client(struct Client *client);
 extern void free_client(struct Client *client);
 
+extern void notify_banned_client(struct Client *, struct ConfItem *, int ban);
 extern int exit_client(struct Client *, struct Client *, struct Client *, const char *);
 
 extern void error_exit_client(struct Client *, int);
