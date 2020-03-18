@@ -614,6 +614,7 @@ extern struct Client *make_client(struct Client *from);
 extern void free_pre_client(struct Client *client);
 extern void free_client(struct Client *client);
 
+extern void notify_banned_client(struct Client *, struct ConfItem *, int ban);
 extern int exit_client(struct Client *, struct Client *, struct Client *, const char *);
 
 extern void error_exit_client(struct Client *, int);
