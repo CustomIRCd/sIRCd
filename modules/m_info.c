@@ -697,6 +697,12 @@ static struct InfoStruct info_table[] = {
         "Force-part local users on channel RESV"
     },
     {
+		"opmod_send_cprivmsg",
+		OUTPUT_BOOLEAN_YN,
+		&ConfigChannel.opmod_send_cprivmsg,
+		"Send messages to @#channel if affected by +u"
+    },
+    {
         "disable_hidden",
         OUTPUT_BOOLEAN_YN,
         &ConfigServerHide.disable_hidden,
