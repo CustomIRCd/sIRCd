@@ -203,6 +203,7 @@ struct config_file_entry
 	int hide_server;
 	int hide_spoof_ips;
 	int hide_error_messages;
+	int oper_chghost;
 	int client_exit;
 	int oper_only_umodes;
 	int oper_umodes;
