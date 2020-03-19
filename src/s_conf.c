@@ -704,6 +704,7 @@ set_default_conf(void)
     ConfigFileEntry.map_oper_only = YES;
     ConfigFileEntry.links_oper_only = YES;
     ConfigFileEntry.operspy_admin_only = NO;
+    ConfigFileEntry.oper_chghost = NO;
     ConfigFileEntry.pace_wait = 10;
     ConfigFileEntry.caller_id_wait = 60;
     ConfigFileEntry.pace_wait_simple = 1;
@@ -1381,7 +1382,7 @@ get_user_ban_reason(struct ConfItem *aconf)
     static char reasonbuf[BUFSIZE];
 
     if (!ConfigFileEntry.hide_tkdline_duration &&
-			aconf->flags & CONF_FLAGS_TEMPORARY &&
+        aconf->flags & CONF_FLAGS_TEMPORARY &&
         (aconf->status == CONF_KILL || aconf->status == CONF_DLINE))
         rb_snprintf(reasonbuf, sizeof reasonbuf,
                     "Temporary %c-line %d min. - ",

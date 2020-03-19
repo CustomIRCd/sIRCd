@@ -2255,6 +2255,7 @@ static struct ConfEntry conf_general_table[] =
 	{ "operspy_dont_care_user_info", CF_YESNO, NULL, 0, &ConfigFileEntry.operspy_dont_care_user_info },
 	{ "secret_channels_in_whois", CF_YESNO, NULL, 0, &ConfigFileEntry.secret_channels_in_whois },
 	{ "pace_wait",		CF_TIME,  NULL, 0, &ConfigFileEntry.pace_wait		},
+	{ "oper_chghost",	CF_YESNO, NULL, 0, &ConfigFileEntry.oper_chghost	},
 	{ "pace_wait_simple",	CF_TIME,  NULL, 0, &ConfigFileEntry.pace_wait_simple	},
 	{ "ping_cookie",	CF_YESNO, NULL, 0, &ConfigFileEntry.ping_cookie		},
 	{ "reject_after_count",	CF_INT,   NULL, 0, &ConfigFileEntry.reject_after_count	},
