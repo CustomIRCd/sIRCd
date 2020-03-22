@@ -4,6 +4,9 @@
 
 - [X] - Import the code from ircd-seven to show the oper name and server used
 - [X] - Add config option to hide durations of temporary K/D-lines
+- [X] - Improve WEBIRC's TLS handling
+- [X] - Make the oper chghost restriction configurable
+- [X] - add @ prefix to op-moderated (+u) messages
 
 ## Changes since Version 1.1.0
 
