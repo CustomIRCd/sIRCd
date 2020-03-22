@@ -1,5 +1,9 @@
 # sIRCd Changes
 
+## Changes since Version 1.1.2
+
+- [] - make m_cloaking an extension again
+
 ## Changes since Version 1.1.1
 
 - [X] - Import the code from ircd-seven to show the oper name and server used
