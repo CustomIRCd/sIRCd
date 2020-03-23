@@ -80,6 +80,7 @@ SRCS =                          \
   no_oper_invis.c		\
   sasl_usercloak.c              \
   sno_globalnickchange.c        \
+  sno_channeljoin.c		\
   spy_admin_notice.c		\
   spy_info_notice.c		\
   spy_links_notice.c		\
