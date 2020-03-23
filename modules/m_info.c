@@ -276,6 +276,12 @@ static struct InfoStruct info_table[] = {
         &ConfigFileEntry.fname_ioerrorlog,
         "IO error log file"
     },
+	{
+		"global_oper_up_notices",
+		OUTPUT_BOOLEAN_YN,
+		&ConfigFileEntry.global_oper_up_notices,
+		"Send oper up notices globally."
+	},
     {
         "global_snotices",
         OUTPUT_BOOLEAN_YN,

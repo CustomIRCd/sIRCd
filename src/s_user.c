@@ -154,19 +154,18 @@ show_lusers(struct Client *source_p)
                        Count.invisi, rb_dlink_list_length(&global_serv_list));
 
     int opercount = 0;
-	rb_dlink_node *operptr;
-	struct Client *oper_p;
+    rb_dlink_node *operptr;
+    struct Client *oper_p;
 
-	// Count opers who are not set umode +B.
-	RB_DLINK_FOREACH(operptr, oper_list.head)
-	{
-		oper_p = operptr->data;
+    // Count opers who are not set umode +B.
+    RB_DLINK_FOREACH(operptr, oper_list.head) {
+        oper_p = operptr->data;
 
-		if(!IsSetBot(oper_p))
-			opercount++;
-	}
+        if(!IsSetBot(oper_p))
+            opercount++;
+    }
 
-	if(opercount > 0)
+    if(opercount > 0)
         sendto_one_numeric(source_p, RPL_LUSEROP,
                            form_str(RPL_LUSEROP), opercount);
 
@@ -1352,9 +1351,9 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
     hdata.oldsnomask = oldsnomask;
     call_hook(h_umode_changed, &hdata);
 
-    sendto_realops_snomask(SNO_GENERAL, L_ALL,
-                           "%s (%s!%s@%s) is now an operator", oper_p->name, source_p->name,
-                           source_p->username, source_p->host);
+    sendto_realops_snomask(SNO_GENERAL, ConfigFileEntry.global_oper_up_notices ? L_NETWIDE : L_ALL,
+                           "%s (%s@%s) is now an operator, using oper  %s", source_p->name,
+                           source_p->username, source_p->orighost, oper_p->name);
     if (!(old & UMODE_INVISIBLE) && IsInvisible(source_p))
         ++Count.invisi;
     if ((old & UMODE_INVISIBLE) && !IsInvisible(source_p))

@@ -1068,18 +1068,17 @@ find_bannickchange_channel(struct Client *client_p)
             if (can_send_banned(msptr))
                 return chptr;
         } else if (is_banned(chptr, client_p, msptr, src_host, src_iphost) == CHFL_BAN
-                   || is_quieted(chptr, client_p, msptr, src_host, src_iphost) == CHFL_BAN)
-            {
-			/* Users with oper override can always change nick regardless.
-			 * No notice is provided yet since the code presently only checks
-			 * for one matching channel, not all.  This may change later.
-			 * - Ben
-			 */
-			if(IsSetOverride(client_p))
-				return NULL;
-			else
-				return chptr;
-		}
+                   || is_quieted(chptr, client_p, msptr, src_host, src_iphost) == CHFL_BAN) {
+            /* Users with oper override can always change nick regardless.
+             * No notice is provided yet since the code presently only checks
+             * for one matching channel, not all.  This may change later.
+             * - Ben
+             */
+            if(IsOverride(client_p))
+                return NULL;
+            else
+                return chptr;
+        }
     }
     return NULL;
 }
