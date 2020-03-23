@@ -284,7 +284,7 @@ is_any_op(struct membership *msptr)
 
 /* is_chanop_voiced()
  *
- * input	- memebership to check for status
+ * input	- membership to check for status
  * output	- 1 if the user is op, halfop, admin, or voice, 0 elsewise
  * side effects -
  */
@@ -299,8 +299,8 @@ is_chanop_voiced(struct membership *msptr)
 
 /* can_kick_deop()
  *
- * input	- two memeberships
- * output	- 1 if the first memebership can kick/deop the second, 0 elsewise
+ * input	- two memberships
+ * output	- 1 if the first membership can kick/deop the second, 0 elsewise
  * side effects -
  */
 int
@@ -1069,7 +1069,17 @@ find_bannickchange_channel(struct Client *client_p)
                 return chptr;
         } else if (is_banned(chptr, client_p, msptr, src_host, src_iphost) == CHFL_BAN
                    || is_quieted(chptr, client_p, msptr, src_host, src_iphost) == CHFL_BAN)
-            return chptr;
+            {
+			/* Users with oper override can always change nick regardless.
+			 * No notice is provided yet since the code presently only checks
+			 * for one matching channel, not all.  This may change later.
+			 * - Ben
+			 */
+			if(IsSetOverride(client_p))
+				return NULL;
+			else
+				return chptr;
+		}
     }
     return NULL;
 }
