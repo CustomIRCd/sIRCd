@@ -82,7 +82,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
             s[KILLLEN] = '\0';
         reason = s;
     } else
-        reason = "<No reason given>";
+        reason = "No reason given";
 
     if((target_p = find_named_person(user)) == NULL) {
         /*
@@ -159,7 +159,7 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
     struct Client *target_p;
     const char *user;
     const char *reason;
-    char default_reason[] = "<No reason given>";
+    char default_reason[] = "No reason given";
     const char *path;
 
     *buf = '\0';
