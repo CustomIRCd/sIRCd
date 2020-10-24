@@ -2,7 +2,7 @@
 
 ## Changes since Version 1.1.2
 
-- [] - make m_cloaking an extension again
+- [X] - make m_cloaking an extension again
 
 ## Changes since Version 1.1.1
 

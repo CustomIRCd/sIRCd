@@ -53,6 +53,7 @@ SRCS =                          \
   extb_unidentified.c           \
   force_user_invis.c		\
   hurt.c			\
+  ip_cloaking.c			\
   sno_farconnect.c		\
   sno_globalkline.c		\
   m_adminwall.c			\
