@@ -59,6 +59,7 @@ DECLARE_MODULE_AV1(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision: 676 $"
 	{ (name), (capserv), (capclient), (flags), sizeof(name) - 1 }
 
 #define CLICAP_FLAGS_STICKY	0x001
+#define CLICAP_FLAGS_HIDDEN	0x008
 
 static struct clicap {
     const char *name;
@@ -72,7 +73,7 @@ static struct clicap {
     _CLICAP("account-notify", CLICAP_ACCOUNT_NOTIFY, 0, 0),
     _CLICAP("extended-join", CLICAP_EXTENDED_JOIN, 0, 0),
     _CLICAP("away-notify", CLICAP_AWAY_NOTIFY, 0, 0),
-    _CLICAP("userhost-in-names", CLICAP_USERHOST_IN_NAMES, 0, 0),
+    _CLICAP("userhost-in-names", CLICAP_USERHOST_IN_NAMES, 0, CLICAP_FLAGS_HIDDEN),
 };
 
 #define CLICAP_LIST_LEN (sizeof(clicap_list) / sizeof(struct clicap))
@@ -196,6 +197,8 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
             /* they are capable of this, check sticky */
             else if(clear && clicap_list[i].flags & CLICAP_FLAGS_STICKY)
                 continue;
+	if(!IsCapable(source_p, clicap_list[i].cap_serv) && clicap_list[i].flags & CLICAP_FLAGS_HIDDEN)
+				continue;
         }
 
         /* \r\n\0, possible "-~=", space, " *" */

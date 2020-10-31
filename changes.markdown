@@ -4,6 +4,7 @@
 
 - [X] - make m_cloaking an extension again
 - [X] - Import connect_delay from ircd-seven
+- [X] - Hide userhost-in-names
 
 ## Changes since Version 1.1.1
 
