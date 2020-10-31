@@ -164,12 +164,11 @@ names_global(struct Client *source_p)
             continue;
 
         if(IsCapable(source_p, CLICAP_USERHOST_IN_NAMES))
-			tlen = rb_sprintf(namebuf, "%s!%s@%s", target_p->name, target_p->username, target_p->host);
-		else
-			tlen = rb_sprintf(namebuf, "%s ", target_p->name);
+            tlen = rb_sprintf(namebuf, "%s!%s@%s", target_p->name, target_p->username, target_p->host);
+        else
+            tlen = rb_sprintf(namebuf, "%s ", target_p->name);
 
-		if((cur_len + tlen + 1) > (BUFSIZE - 3))
-	{
+        if((cur_len + tlen + 1) > (BUFSIZE - 3)) {
             sendto_one(source_p, "%s", buf);
             cur_len = mlen;
             t = buf + mlen;

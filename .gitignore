@@ -11,6 +11,7 @@ Makefile
 .libs/
 config.log
 config.status
+check_style.sh
 
 autom4te.cache/
 include/serno.h

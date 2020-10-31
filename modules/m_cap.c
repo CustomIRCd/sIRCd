@@ -197,8 +197,8 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
             /* they are capable of this, check sticky */
             else if(clear && clicap_list[i].flags & CLICAP_FLAGS_STICKY)
                 continue;
-	if(!IsCapable(source_p, clicap_list[i].cap_serv) && clicap_list[i].flags & CLICAP_FLAGS_HIDDEN)
-				continue;
+            if(!IsCapable(source_p, clicap_list[i].cap_serv) && clicap_list[i].flags & CLICAP_FLAGS_HIDDEN)
+                continue;
         }
 
         /* \r\n\0, possible "-~=", space, " *" */

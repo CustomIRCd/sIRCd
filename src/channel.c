@@ -580,26 +580,25 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
                 continue;
 
             if(IsCapable(client_p, CLICAP_USERHOST_IN_NAMES))
-				tlen = rb_sprintf(namebuf, "%s%s!%s@%s ", find_channel_status(msptr, stack),
-						target_p->name, target_p->username, target_p->host);
-			else
-				tlen = rb_sprintf(namebuf, "%s%s ", find_channel_status(msptr, stack),
-						target_p->name);
+                tlen = rb_sprintf(namebuf, "%s%s!%s@%s ", find_channel_status(msptr, stack),
+                                  target_p->name, target_p->username, target_p->host);
+            else
+                tlen = rb_sprintf(namebuf, "%s%s ", find_channel_status(msptr, stack),
+                                  target_p->name);
 
-			/* space, possible "@+" prefix */
-			if(cur_len + tlen >= BUFSIZE - 3)
-			{
-				*(t - 1) = '\0';
-				sendto_one(client_p, "%s", lbuf);
-				cur_len = mlen;
-				t = lbuf + mlen;
-			}
+            /* space, possible "@+" prefix */
+            if(cur_len + tlen >= BUFSIZE - 3) {
+                *(t - 1) = '\0';
+                sendto_one(client_p, "%s", lbuf);
+                cur_len = mlen;
+                t = lbuf + mlen;
+            }
 
-			strcpy(t, namebuf);
+            strcpy(t, namebuf);
 
-			cur_len += tlen;
-			t += tlen;
-		}
+            cur_len += tlen;
+            t += tlen;
+        }
 
         /* The old behaviour here was to always output our buffer,
          * even if there are no clients we can show.  This happens
