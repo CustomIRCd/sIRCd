@@ -220,6 +220,7 @@ struct config_file_entry
 	int use_whois_actually;
 	int disable_auth;
 	int connect_timeout;
+	int connect_delay;
 	int burst_away;
 	int reject_ban_time;
 	int reject_after_count;

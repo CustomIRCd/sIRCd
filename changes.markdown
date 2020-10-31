@@ -3,6 +3,7 @@
 ## Changes since Version 1.1.2
 
 - [X] - make m_cloaking an extension again
+- [X] - Import connect_delay from ircd-seven
 
 ## Changes since Version 1.1.1
 
