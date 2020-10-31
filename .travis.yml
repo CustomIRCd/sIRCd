@@ -13,4 +13,4 @@ notifications:
   template:
       - "%{repository_name} - %{commit}/%{commit_message} - %{author})"
       - "Build Status %{message}"
-  irc: "ircs://irc.freedomofspeech.casa:6697#ircd-dev"
+  irc: "ircs://irc.freedomofspeech.casa:6697#devlounge"
