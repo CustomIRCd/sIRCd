@@ -6,6 +6,7 @@
 - [X] - Import connect_delay from ircd-seven
 - [X] - Hide userhost-in-names
 - [X] - Enforce need_ssl for webirc
+- [X] - Improved SASL usercloak
 
 ## Changes since Version 1.1.1
 

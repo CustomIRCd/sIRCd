@@ -2,6 +2,7 @@
 #include "modules.h"
 #include "hook.h"
 #include "client.h"
+#include "hostmask.h"
 #include "ircd.h"
 #include "send.h"
 #include "hash.h"
@@ -14,90 +15,155 @@
 
 static void check_new_user(void *data);
 mapi_hfn_list_av1 sasl_usercloak_hfnlist[] = {
-    { "new_local_user", (hookfn) check_new_user },
-    { NULL, NULL }
+	{ "new_local_user", (hookfn) check_new_user },
+	{ NULL, NULL }
 };
 
 DECLARE_MODULE_AV1(sasl_usercloak, NULL, NULL, NULL, NULL,
-                   sasl_usercloak_hfnlist, "$Revision: 3526 $");
+			sasl_usercloak_hfnlist, "$Revision: 3526 $");
+
+enum
+{
+	D_LINED,
+	K_LINED
+};
+
+static void
+notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
+{
+	static const char conn_closed[] = "Connection closed";
+	static const char d_lined[] = "D-lined";
+	static const char k_lined[] = "K-lined";
+	const char *reason = NULL;
+	const char *exit_reason = conn_closed;
+
+	if(ConfigFileEntry.kline_with_reason)
+	{
+		reason = get_user_ban_reason(aconf);
+		exit_reason = reason;
+	}
+	else
+	{
+		reason = aconf->status == D_LINED ? d_lined : k_lined;
+	}
+
+	if(ban == D_LINED && !IsPerson(client_p))
+		sendto_one(client_p, "NOTICE DLINE :*** You have been D-lined");
+	else
+		sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
+			   me.name, client_p->name, reason);
+
+	exit_client(client_p, client_p, &me,
+			EmptyString(ConfigFileEntry.kline_reason) ? exit_reason :
+			 ConfigFileEntry.kline_reason);
+}
 
 unsigned int fnv_hash_string(char *str)
 {
-    unsigned int hash = 0x811c9dc5; // Magic value for 32-bit fnv1 hash initialisation.
-    unsigned char *p = (unsigned char *)str;
-    while (*p) {
-        hash += (hash<<1) + (hash<<4) + (hash<<7) + (hash<<8) + (hash<<24);
-        hash ^= *p++;
-    }
-    return hash;
+	unsigned int hash = 0x811c9dc5; // Magic value for 32-bit fnv1 hash initialisation.
+	unsigned char *p = (unsigned char *)str;
+	while (*p)
+	{
+		hash += (hash<<1) + (hash<<4) + (hash<<7) + (hash<<8) + (hash<<24);
+		hash ^= *p++;
+	}
+	return hash;
 }
 
 static void
 check_new_user(void *vdata)
 {
-    struct Client *source_p = (void *)vdata;
+	struct Client *source_p = (void *)vdata;
 
-    if (!IsIPSpoof(source_p))
-        return;
+	if (!IsIPSpoof(source_p))
+		return;
 
-    if (EmptyString(source_p->user->suser))
-        return;
+	if (EmptyString(source_p->user->suser))
+		return;
 
-    char *accountpart = strstr(source_p->orighost, "account");
-    if (!accountpart)
-        return;
+	char *accountpart = strstr(source_p->orighost, "/account");
+	if (!accountpart || accountpart[8] != '\0')
+		return;
 
-    char buf[HOSTLEN];
-    memset(buf, 0, sizeof(buf));
-    char *dst = buf;
+	accountpart += 1;
 
-    strncpy(buf, source_p->orighost, accountpart - source_p->orighost);
-    dst += accountpart - source_p->orighost;
+	char buf[HOSTLEN];
+	memset(buf, 0, sizeof(buf));
+	char *dst = buf;
 
-    int needhash = 0;
+	strncpy(buf, source_p->orighost, accountpart - source_p->orighost);
+	dst += accountpart - source_p->orighost;
 
-    for (char *src = source_p->user->suser; *src ; src++ ) {
-        if (dst > buf + sizeof(buf)) {
-            /* Doesn't fit. Warn opers and bail. */
-            sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-                                   "Couldn't fit account name part %s in hostname for %s!%s@%s",
-                                   source_p->user->suser, source_p->name, source_p->username, source_p->orighost);
-            return;
-        }
+	int needhash = 0;
 
-        char c = ToLower(*src);
+	for (char *src = source_p->user->suser; *src ; src++ )
+	{
+		if (dst >= buf + sizeof(buf))
+		{
+			/* Doesn't fit. Warn opers and bail. */
+			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
+					"Couldn't fit account name part %s in hostname for %s!%s@%s",
+					source_p->user->suser, source_p->name, source_p->username, source_p->orighost);
+			return;
+		}
 
-        if (IsHostChar(c))
-            *dst++ = c;
-        else
-            needhash = 1;
-    }
+		char c = ToLower(*src);
 
-    if (needhash) {
-        if (dst > buf + sizeof(buf) - 12) { /* '/x-' plus eight digit hash plus null terminator */
-            /* Doesn't fit. Warn opers and bail. */
-            sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-                                   "Couldn't fit account name part %s in hostname for %s!%s@%s",
-                                   source_p->user->suser, source_p->name, source_p->username, source_p->orighost);
-            return;
-        }
+		if (IsHostChar(c))
+			*dst++ = c;
+		else
+			needhash = 1;
+	}
 
-        *dst++ = '/';
-        *dst++ = 'x';
-        *dst++ = '-';
+	if (needhash)
+	{
+		if (dst > buf + sizeof(buf) - 12) /* '/x-' plus eight digit hash plus null terminator */
+		{
+			/* Doesn't fit. Warn opers and bail. */
+			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
+					"Couldn't fit account name part %s in hostname for %s!%s@%s",
+					source_p->user->suser, source_p->name, source_p->username, source_p->orighost);
+			return;
+		}
 
-        unsigned int hashval = fnv_hash_string(source_p->user->suser);
-        hashval %= 100000000; // eight digits only please.
-        snprintf(dst, 9, "%08ud", hashval);
-    }
+		*dst++ = '/';
+		*dst++ = 'x';
+		*dst++ = '-';
 
-    /* just in case */
-    buf[HOSTLEN-1] = '\0';
+		unsigned int hashval = fnv_hash_string(source_p->user->suser);
+		hashval %= 100000000; // eight digits only please.
+		snprintf(dst, 9, "%08u", hashval);
+	}
 
-    /* If hostname has been changed already (probably by services cloak on SASL login), then
-     * leave it intact. If not, change it. In either case, update the original hostname.
-     */
-    if (0 == irccmp(source_p->host, source_p->orighost))
-        change_nick_user_host(source_p, source_p->name, source_p->username, buf, 0, "Changing host");
-    strncpy(source_p->orighost, buf, HOSTLEN);
+	/* just in case */
+	buf[HOSTLEN-1] = '\0';
+
+	/* If hostname has been changed already (probably by services cloak on SASL login), then
+	 * leave it intact. If not, change it. In either case, update the original hostname.
+	 */
+	if (0 == irccmp(source_p->host, source_p->orighost))
+		change_nick_user_host(source_p, source_p->name, source_p->username, buf, 0, "Changing host");
+	strncpy(source_p->orighost, buf, HOSTLEN);
+
+	{
+		struct ConfItem *aconf = find_kline(source_p);
+
+		if(aconf == NULL)
+			return;
+
+		if(IsExemptKline(source_p))
+		{
+			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
+						 "KLINE over-ruled for %s, client is kline_exempt [%s@%s]",
+						 get_client_name(source_p, HIDE_IP),
+						 aconf->user, aconf->host);
+			return;
+		}
+
+		sendto_realops_snomask(SNO_GENERAL, L_ALL,
+					 "KLINE active for %s",
+					 get_client_name(source_p, HIDE_IP));
+
+		notify_banned_client(source_p, aconf, K_LINED);
+	}
 }
