@@ -520,6 +520,10 @@ struct ListClient
 #define SetFlush(x)		((x)->localClient->localflags |= LFLAGS_FLUSH)
 #define ClearFlush(x)		((x)->localClient->localflags &= ~LFLAGS_FLUSH)
 
+#define IsInsecure(x)		((x)->localClient->localflags & LFLAGS_INSECURE)
+#define SetInsecure(x)		((x)->localClient->localflags |= LFLAGS_INSECURE)
+#define ClearInsecure(x)		((x)->localClient->localflags &= ~LFLAGS_INSECURE)
+
 
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
