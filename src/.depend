@@ -513,7 +513,8 @@ s_conf.o: s_conf.c ../include/stdinc.h ../libratbox/include/ratbox_lib.h \
  ../include/hook.h ../include/numeric.h ../include/logger.h \
  ../include/send.h ../include/reject.h ../include/cache.h \
  ../include/blacklist.h ../include/privilege.h ../include/sslproc.h \
- ../include/bandbi.h ../include/operhash.h ../include/chmode.h
+ ../include/bandbi.h ../include/operhash.h ../include/chmode.h \
+ ../include/supported.h
 s_newconf.o: s_newconf.c ../include/stdinc.h \
  ../libratbox/include/ratbox_lib.h ../libratbox/include/librb-config.h \
  ../libratbox/include/rb_tools.h ../libratbox/include/rb_memory.h \

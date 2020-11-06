@@ -338,7 +338,7 @@ m_cap.so: m_cap.c ../include/stdinc.h ../libratbox/include/ratbox_lib.h \
  ../include/ircd.h ../include/numeric.h ../include/msg.h \
  ../include/parse.h ../include/irc_dictionary.h ../include/modules.h \
  ../include/parse.h ../include/msg.h ../include/hook.h \
- ../include/s_serv.h ../include/s_user.h
+ ../include/s_serv.h ../include/s_user.h ../include/hash.h
 m_capab.so: m_capab.c ../include/stdinc.h \
  ../libratbox/include/ratbox_lib.h ../libratbox/include/librb-config.h \
  ../libratbox/include/rb_tools.h ../libratbox/include/rb_memory.h \
@@ -464,23 +464,6 @@ m_cmessage.so: m_cmessage.c ../include/stdinc.h \
  ../include/parse.h ../include/irc_dictionary.h ../include/msg.h \
  ../include/hook.h ../include/hash.h ../include/send.h \
  ../include/s_conf.h ../include/class.h ../include/packet.h
-m_cloaking.so: m_cloaking.c ../include/stdinc.h \
- ../libratbox/include/ratbox_lib.h ../libratbox/include/librb-config.h \
- ../libratbox/include/rb_tools.h ../libratbox/include/rb_memory.h \
- ../libratbox/include/rb_commio.h ../libratbox/include/rb_balloc.h \
- ../libratbox/include/rb_linebuf.h ../libratbox/include/rb_snprintf.h \
- ../libratbox/include/rb_event.h ../libratbox/include/rb_helper.h \
- ../libratbox/include/rb_rawbuf.h ../libratbox/include/rb_patricia.h \
- ../include/config.h ../include/setup.h ../include/defaults.h \
- ../include/ircd_defs.h ../include/logger.h ../include/send.h \
- ../include/modules.h ../include/parse.h ../include/irc_dictionary.h \
- ../include/msg.h ../include/hook.h ../include/hook.h ../include/client.h \
- ../include/channel.h ../include/res.h ../include/common.h \
- ../include/reslib.h ../include/match.h ../include/ircd.h \
- ../include/snomask.h ../include/client.h ../include/privilege.h \
- ../include/stdinc.h ../include/ircd.h ../include/send.h \
- ../include/hash.h ../include/s_conf.h ../include/class.h \
- ../include/s_user.h ../include/s_serv.h ../include/numeric.h
 m_connect.so: m_connect.c ../include/stdinc.h \
  ../libratbox/include/ratbox_lib.h ../libratbox/include/librb-config.h \
  ../libratbox/include/rb_tools.h ../libratbox/include/rb_memory.h \
