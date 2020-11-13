@@ -7,6 +7,7 @@
 - [X] - Hide userhost-in-names
 - [X] - Enforce need_ssl for webirc
 - [X] - Improved SASL usercloak
+- [X] - Unicode nicknames
 
 ## Changes since Version 1.1.1
 
