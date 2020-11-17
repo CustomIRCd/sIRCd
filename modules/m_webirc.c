@@ -66,8 +66,8 @@ DECLARE_MODULE_AV1(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision: 207
 
 static void new_local_user(void *data);
 mapi_hfn_list_av1 webirc_hfnlist[] = {
-	{ "new_local_user", (hookfn) new_local_user },
-	{ NULL, NULL }
+    { "new_local_user", (hookfn) new_local_user },
+    { NULL, NULL }
 };
 
 /*
@@ -123,26 +123,22 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
         return 0;
     }
 
-    if (parc >= 6)
-	{
-		char *s;
-		for (s = parv[5]; s != NULL; (s = strchr(s, ' ')) && s++)
-		{
-			if (!ircncmp(s, "secure", 6) && (s[6] == '=' || s[6] == ' ' || s[6] == '\0'))
-				secure = 1;
-		}
-	}
+    if (parc >= 6) {
+        char *s;
+        for (s = parv[5]; s != NULL; (s = strchr(s, ' ')) && s++) {
+            if (!ircncmp(s, "secure", 6) && (s[6] == '=' || s[6] == ' ' || s[6] == '\0'))
+                secure = 1;
+        }
+    }
 
-	if (secure && !IsSSL(source_p))
-	{
-		sendto_one(source_p, "NOTICE * :CGI:IRC is not connected securely; marking you as insecure");
-		secure = 0;
-	}
+    if (secure && !IsSSL(source_p)) {
+        sendto_one(source_p, "NOTICE * :CGI:IRC is not connected securely; marking you as insecure");
+        secure = 0;
+    }
 
-	if (!secure)
-	{
-		SetInsecure(source_p);
-	}
+    if (!secure) {
+        SetInsecure(source_p);
+    }
 
 
     rb_strlcpy(source_p->sockhost, parv[4], sizeof(source_p->sockhost));
@@ -173,9 +169,9 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 static void
 new_local_user(void *data)
 {
-	struct Client *source_p = data;
-	struct ConfItem *aconf = source_p->localClient->att_conf;
+    struct Client *source_p = data;
+    struct ConfItem *aconf = source_p->localClient->att_conf;
 
-	if (!irccmp(aconf->info.name, "webirc."))
-		exit_client(source_p, source_p, &me, "Cannot log in using a WEBIRC block");
+    if (!irccmp(aconf->info.name, "webirc."))
+        exit_client(source_p, source_p, &me, "Cannot log in using a WEBIRC block");
 }

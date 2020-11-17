@@ -734,7 +734,7 @@ unsigned int CharAttrs[] = {
     /* } */ PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
     /* ~ */ PRINT_C | NICK_C | DIGIT_C | ALPHA_C | CHAN_C | NONEOS_C | USER_C,
     /* del  */ CHAN_C | NONEOS_C,
-    #define UNICODE_NICKS
+#define UNICODE_NICKS
 #ifdef UNICODE_NICKS
     /* 0x80 */ CHAN_C | NONEOS_C | NICK_C | HOST_C,
     /* 0x81 */ CHAN_C | NONEOS_C | NICK_C | HOST_C,

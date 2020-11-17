@@ -8,6 +8,7 @@
 - [X] - Enforce need_ssl for webirc
 - [X] - Improved SASL usercloak
 - [X] - Unicode nicknames
+- [X] - Import fakechannels to /LIST
 
 ## Changes since Version 1.1.1
 

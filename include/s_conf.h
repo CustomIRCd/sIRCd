@@ -1,3 +1,4 @@
+
 /*
  *  charybdis: Advanced, scalable Internet Relay Chat.
  *  s_conf.h: A header for the configuration functions.
@@ -197,6 +198,7 @@ struct config_file_entry
 	int operspy_admin_only;
 	int pace_wait;
 	int pace_wait_simple;
+	int listfake_wait;
 	int short_motd;
 	int no_oper_flood;
 	int true_no_oper_flood;
@@ -231,7 +233,6 @@ struct config_file_entry
 	int collision_fnc;
 	int resv_fnc;
 	int default_umodes;
-	int global_oper_up_notices;
 	int global_snotices;
 	int operspy_dont_care_user_info;
 	int servermask;
@@ -330,6 +331,15 @@ struct alias_entry
 	char *target;
 	int flags;			/* reserved for later use */
 	int hits;
+};
+
+struct fakechannel_entry
+{
+	char *name;
+	char *topic;
+
+	int users_min;
+	int users_max;
 };
 
 /* All variables are GLOBAL */

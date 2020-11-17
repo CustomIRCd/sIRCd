@@ -708,6 +708,7 @@ set_default_conf(void)
     ConfigFileEntry.pace_wait = 10;
     ConfigFileEntry.caller_id_wait = 60;
     ConfigFileEntry.pace_wait_simple = 1;
+    ConfigFileEntry.listfake_wait = 0;
     ConfigFileEntry.short_motd = NO;
     ConfigFileEntry.no_oper_flood = NO;
     ConfigFileEntry.true_no_oper_flood = NO;
@@ -727,7 +728,6 @@ set_default_conf(void)
     ConfigFileEntry.burst_away = NO;
     ConfigFileEntry.collision_fnc = YES;
     ConfigFileEntry.resv_fnc = YES;
-    ConfigFileEntry.global_oper_up_notices = YES;
     ConfigFileEntry.global_snotices = YES;
     ConfigFileEntry.operspy_dont_care_user_info = NO;
     ConfigFileEntry.use_propagated_bans = YES;
@@ -806,6 +806,9 @@ set_default_conf(void)
 
     if (!alias_dict)
         alias_dict = irc_dictionary_create(strcasecmp);
+
+    if (!fakechannel_dict)
+        fakechannel_dict = irc_dictionary_create(irccmp);
 }
 
 #undef YES
@@ -1492,6 +1495,19 @@ free_alias_cb(struct DictionaryElement *ptr, void *unused)
 }
 
 /*
+ * free an fakechannel{} entry.
+ */
+static void
+free_fakechannel_cb(struct DictionaryElement *ptr, void *unused)
+{
+    struct fakechannel_entry *aptr = ptr->data;
+
+    rb_free(aptr->name);
+    rb_free(aptr->topic);
+    rb_free(aptr);
+}
+
+/*
  * clear_out_old_conf
  *
  * inputs       - none
@@ -1570,6 +1586,12 @@ clear_out_old_conf(void)
     if (alias_dict != NULL) {
         irc_dictionary_destroy(alias_dict, free_alias_cb, NULL);
         alias_dict = NULL;
+    }
+
+    /* remove any fakechannels */
+    if (fakechannel_dict != NULL) {
+        irc_dictionary_destroy(fakechannel_dict, free_fakechannel_cb, NULL);
+        fakechannel_dict = NULL;
     }
 
     destroy_blacklists();

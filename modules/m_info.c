@@ -282,12 +282,6 @@ static struct InfoStruct info_table[] = {
         &ConfigFileEntry.fname_ioerrorlog,
         "IO error log file"
     },
-	{
-		"global_oper_up_notices",
-		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.global_oper_up_notices,
-		"Send oper up notices globally."
-	},
     {
         "global_snotices",
         OUTPUT_BOOLEAN_YN,
@@ -443,6 +437,12 @@ static struct InfoStruct info_table[] = {
         OUTPUT_DECIMAL,
         &ConfigFileEntry.pace_wait_simple,
         "Minimum delay between less intensive commands"
+    },
+    {
+		"listfake_wait",
+		OUTPUT_DECIMAL,
+		&ConfigFileEntry.listfake_wait,
+		"Time until real list command can be used"
     },
     {
         "ping_cookie",
