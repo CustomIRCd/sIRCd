@@ -2,6 +2,8 @@
 
 ## Changes since Version 1.1.3
 
+- [X] - Update some new units of time and data.
+
 ## Changes since Version 1.1.2
 
 - [X] - make m_cloaking an extension again
