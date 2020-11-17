@@ -1,4 +1,6 @@
-# sIRCd Changes
+## sIRCd Changes
+
+## Changes since Version 1.1.3
 
 ## Changes since Version 1.1.2
 
