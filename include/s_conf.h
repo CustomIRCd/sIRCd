@@ -152,6 +152,8 @@ struct config_file_entry
         int static_parts;
 	char *static_part_reason;
 
+	int hide_uids_in_whois;
+
 	char *identifyservice;
 	char *identifycommand;
         char *sasl_service;

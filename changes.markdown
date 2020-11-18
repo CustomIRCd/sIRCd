@@ -2,7 +2,7 @@
 
 ## Changes since Version 1.1.3
 
-- [X] - Update some new units of time and data.
+- [X] - m_whois: Add hide_uids_in_whois option, default to "yes." 
 
 ## Changes since Version 1.1.2
 

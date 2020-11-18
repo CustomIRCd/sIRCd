@@ -204,6 +204,12 @@ static struct InfoStruct info_table[] = {
         "The reason clients will part with, if static_parts is enabled.",
     },
     {
+	"hide_uids_in_whois",
+		OUTPUT_BOOLEAN_YN,
+		&ConfigFileEntry.hide_uids_in_whois,
+		"Hide UIDs in WHOIS output to all."
+	},
+	{
         "disable_auth",
         OUTPUT_BOOLEAN_YN,
         &ConfigFileEntry.disable_auth,

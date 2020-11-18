@@ -337,7 +337,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
     if(IsSSLClient(target_p))
         sendto_one_numeric(source_p, RPL_WHOISSECURE, form_str(RPL_WHOISSECURE),
                            target_p->name);
-    if((source_p == target_p || IsOper(source_p)))
+    if(!ConfigFileEntry.hide_uids_in_whois && (source_p == target_p || IsOper(source_p)))
         sendto_one_numeric(source_p, RPL_WHOISYOURID,
                            form_str(RPL_WHOISYOURID),
                            target_p->name, target_p->id);
