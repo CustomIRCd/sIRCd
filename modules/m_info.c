@@ -180,11 +180,17 @@ static struct InfoStruct info_table[] = {
         "Default vhost for operators to receive upon opering up.",
     },
     {
-        "static_quit",
-        OUTPUT_STRING,
-        &ConfigFileEntry.static_quit,
-        "Quit message to show for all users.",
-    },
+    "static_quits",
+		OUTPUT_BOOLEAN_YN,
+		&ConfigFileEntry.static_quits,
+		"If enabled, all clients will quit with static_quit_reason.",
+     },
+	{
+		"static_quit_reason",
+		OUTPUT_STRING,
+		&ConfigFileEntry.static_quit_reason,
+		"The reason clients will quit with, if static_quits is enabled.",
+	},
     {
         "servicestring",
         OUTPUT_STRING,

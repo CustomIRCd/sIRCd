@@ -667,11 +667,13 @@ set_default_conf(void)
     ConfigFileEntry.default_operstring = rb_strdup("is an IRC operator");
     ConfigFileEntry.default_adminstring = rb_strdup("is a Server Administrator");
     ConfigFileEntry.default_operhost = rb_strdup("");
-    ConfigFileEntry.static_quit = rb_strdup("");
     ConfigFileEntry.servicestring = rb_strdup("is a Network Service");
     ConfigFileEntry.sasl_service = rb_strdup("SaslServ");
     ConfigFileEntry.static_parts = NO;
     ConfigFileEntry.static_part_reason = NULL;
+
+    ConfigFileEntry.static_quits = NO;
+    ConfigFileEntry.static_quit_reason = NULL;
 
     ConfigFileEntry.hide_uids_in_whois = YES;
 
@@ -853,7 +855,10 @@ validate_conf(void)
         ServerInfo.mask_name = rb_strdup(SERVER_NAME_MASK_DEFAULT);
 
     if (ConfigFileEntry.static_part_reason == NULL)
-        ConfigFileEntry.static_part_reason = rb_strdup("");
+        ConfigFileEntry.static_part_reason = rb_strdup(" ");
+
+    if (ConfigFileEntry.static_quit_reason == NULL)
+        ConfigFileEntry.static_quit_reason = rb_strdup(" ");
 
     if(ServerInfo.ssld_count < 1)
         ServerInfo.ssld_count = 1;

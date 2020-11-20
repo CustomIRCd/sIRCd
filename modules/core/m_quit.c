@@ -69,12 +69,13 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
         comment = reason;
     }
 
-    if(!IsOper(source_p) && !EmptyString(ConfigFileEntry.static_quit)) {
-        exit_client(client_p, source_p, source_p, ConfigFileEntry.static_quit);
+    if(ConfigFileEntry.static_quits)
+	{
+        exit_client(client_p, source_p, source_p, ConfigFileEntry.static_quit_reason);
         return 0;
     }
 
-    if(!IsOper(source_p) && !ConfigFileEntry.static_quit &&
+    if(!IsOper(source_p) && !ConfigFileEntry.static_quits &&
        (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time) >
        rb_current_time()) {
         exit_client(client_p, source_p, source_p, "Client Quit");

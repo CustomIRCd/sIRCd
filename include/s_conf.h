@@ -146,7 +146,8 @@ struct config_file_entry
 	char *default_operstring;
 	char *default_adminstring;
 	char *default_operhost;
-	char *static_quit;
+	int static_quits;
+	char *static_quit_reason;
 	char *servicestring;
 	char *kline_reason;
         int static_parts;
