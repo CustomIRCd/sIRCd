@@ -72,8 +72,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 
     sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
                        ircd_version, serno,
-                       me.name, confopts(source_p), TS_CURRENT,
-                       ServerInfo.sid);
+                       me.name, confopts(source_p), TS_CURRENT);
 
     show_isupport(source_p);
 
@@ -90,8 +89,7 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
     if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME) {
         sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
                            ircd_version, serno,
-                           me.name, confopts(source_p), TS_CURRENT,
-                           ServerInfo.sid);
+                           me.name, confopts(source_p), TS_CURRENT);
         show_isupport(source_p);
     }
 
