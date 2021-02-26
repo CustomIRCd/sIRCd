@@ -83,8 +83,6 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
     struct ConfItem *aconf;
     const char *encr;
 
-    int secure = 0;
-
     if (!strchr(parv[4], '.') && !strchr(parv[4], ':')) {
         sendto_one(source_p, "NOTICE * :Invalid IP");
         return 0;
@@ -121,23 +119,6 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
     if (strcmp(encr, aconf->passwd)) {
         sendto_one(source_p, "NOTICE * :CGI:IRC password incorrect");
         return 0;
-    }
-
-    if (parc >= 6) {
-        char *s;
-        for (s = parv[5]; s != NULL; (s = strchr(s, ' ')) && s++) {
-            if (!ircncmp(s, "secure", 6) && (s[6] == '=' || s[6] == ' ' || s[6] == '\0'))
-                secure = 1;
-        }
-    }
-
-    if (secure && !IsSSL(source_p)) {
-        sendto_one(source_p, "NOTICE * :CGI:IRC is not connected securely; marking you as insecure");
-        secure = 0;
-    }
-
-    if (!secure) {
-        SetInsecure(source_p);
     }
 
 
