@@ -96,14 +96,14 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
     }
 
     if(IsOperConfNeedSSL(oper_p) && !IsSSLClient(source_p)) {
-        sendto_one_numeric(source_p, ERR_NOOPERHOST, form_str(ERR_NOOPERHOST));
+        sendto_one_notice(source_p, ":You must be using a secure connection to /OPER on this server");
         ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s) (%s) -- requires SSL/TLS",
              name, source_p->name,
              source_p->username, source_p->host, source_p->sockhost);
 
         if(ConfigFileEntry.failed_oper_notice) {
             sendto_realops_snomask(SNO_GENERAL, L_ALL,
-                                   "Failed OPER attempt - missing SSL/TLS by %s (%s@%s)",
+                                   "Failed OPER attempt - missing secure connection by %s (%s@%s)",
                                    source_p->name, source_p->username, source_p->host);
         }
         return 0;
